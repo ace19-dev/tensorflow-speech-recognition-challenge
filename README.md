@@ -13,7 +13,7 @@
 - Submissions are evaluated on Multiclass Accuracy, which is simply the average number of observations with the correct label.
 - For audio clip in the test set, you must predict the correct label
 - fname,label
-clip_000044442.wav,silence
+clip_000044442.wav,silence/n
 clip_0000adecb.wav,left
 clip_0000d4322.wav,unknown
 etc.
