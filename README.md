@@ -1,2 +1,2 @@
-# Kaggle-Competition-2nd
+# Kaggle-Competitions-2nd
 TensorFlow Speech Recognition Challenge
