@@ -19,7 +19,7 @@
   - 
 
 
-## spectrogram
+## # spectrogram
 - A spectrogram is a visual representation of the spectrum of frequencies of sound or other signal as they vary with time or some other variable
 - Spectrograms can be used to identify spoken words phonetically, and to analyse the various calls of animals. They are used extensively in the development of the fields of music, sonar, radar, and speech processing,[1] seismology, and others.
 
