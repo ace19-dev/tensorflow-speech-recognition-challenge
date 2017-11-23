@@ -24,6 +24,9 @@
 - Because the human ear is more sensitive to some frequencies than others, it's been traditional in speech recognition to do further processing to this representation to turn it into a set of Mel-Frequency Cepstral Coefficients, or MFCCs for short
 - f you're targeting general sounds rather than speech you may find you can skip this step and operate directly on the spectrograms.
 - <b>The image that's produced by these processing steps is then fed into a multi-layer convolutional neural network, with a fully-connected layer followed by a softmax at the end.</b>
+
+
+## Soruce
 - https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/speech_commands
 
 
