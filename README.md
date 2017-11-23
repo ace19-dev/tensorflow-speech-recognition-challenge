@@ -20,7 +20,7 @@
 
 
 ### Prerequisite
-- Google Research Blog Post announcing the Speech Commands Dataset. Note that much of what is provided as part of the training set is already public. However, the test set is not.
+- Google Research Blog Post announcing the Speech Commands Dataset. Note that much of what is provided as part of the training set is already public. However, the test set is not. (https://www.tensorflow.org/versions/master/tutorials/audio_recognition)
 - TensorFlow Audio Recognition Tutorial
 - Link to purchase Raspberry Pi 3 on Amazon. This will be at your own expense.
 - Also review the Prizes tab for details and tools for how the special prize will be evaluated.
