@@ -26,7 +26,7 @@
 - <b>The image that's produced by these processing steps is then fed into a multi-layer convolutional neural network, with a fully-connected layer followed by a softmax at the end.</b>
 
 
-## Soruce
+## Source
 - https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/speech_commands
 
 
