@@ -17,7 +17,7 @@
   - this is done by grouping the incoming audio samples into short segments, just a few milliseconds long, calculating the strength of the frequencies across a set of bands
   - Each set of frequency strengths from a segment is treated as a vector of numbers, and those vectors are arranged in time order to form a two-dimensional array.
   - This array of values can then be treated like a single-channel image, and is known as a spectrogram
-  - you can run the `wav_to_spectrogram tool:
+  - you can run the wav_to_spectrogram tool:
   ```diff
     bazel run tensorflow/examples/wav_to_spectrogram:wav_to_spectrogram -- \
       --input_wav=/tmp/speech_dataset/happy/ab00c4b2_nohash_0.wav \
@@ -25,7 +25,7 @@
   ```
 - Because the human ear is more sensitive to some frequencies than others, it's been traditional in speech recognition to do further processing to this representation to turn it into a set of Mel-Frequency Cepstral Coefficients, or MFCCs for short
 - f you're targeting general sounds rather than speech you may find you can skip this step and operate directly on the spectrograms.
-- <font color="red"> The image that's produced by these processing steps is then fed into a multi-layer convolutional neural network, with a fully-connected layer followed by a softmax at the end.</font>
+- <span style="color:orange;"> The image that's produced by these processing steps is then fed into a multi-layer convolutional neural network, with a fully-connected layer followed by a softmax at the end.</span>
 
 
 ## Source
