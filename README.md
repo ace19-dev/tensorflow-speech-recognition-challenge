@@ -27,4 +27,4 @@
 - Google Research Blog Post announcing the Speech Commands Dataset. Note that much of what is provided as part of the training set is already public. However, the test set is not. (https://research.googleblog.com/2017/08/launching-speech-commands-dataset.html)
 - TensorFlow Audio Recognition Tutorial (https://www.tensorflow.org/versions/master/tutorials/audio_recognition)
 - Link to purchase Raspberry Pi 3 on Amazon. This will be at your own expense.
-- Also review the Prizes tab for details and tools for how the special prize will be evaluated.
+- Also review the Prizes tab for details and tools for how the special prize will be evaluated. (https://www.kaggle.com/c/tensorflow-speech-recognition-challenge#Prizes)
