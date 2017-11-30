@@ -9,8 +9,9 @@
 ### custom training data 
 - create custom training data
 - add background noise
-- change time_shifting
+- time shifting
 - Other parameters to customize
+  - You'll need to make sure that all your training data contains the right audio in the initial portion of the clip though.
 
 ### customizing the model
 - low_latency_conv
