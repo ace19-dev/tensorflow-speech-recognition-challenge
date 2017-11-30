@@ -1,7 +1,7 @@
 # Kaggle Competitions
 
 ## Team name
-- TechUnit-101
+- Awesome-101
 - 
 
 ## TensorFlow Speech Recognition Challenge
