@@ -24,7 +24,8 @@ import numpy as np
 import tensorflow as tf
 
 from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
-from tensorflow.examples.speech_commands import input_data
+# from tensorflow.examples.speech_commands import input_data
+import input_data
 from tensorflow.python.platform import test
 
 
