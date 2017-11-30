@@ -283,7 +283,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='/DL_project/speech_commands/tmp/speech_dataset/',
+      default='/dl_data/speech_commands/speech_dataset/',
       help="""\
       Where to download the speech training data to.
       """)
@@ -380,7 +380,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--summaries_dir',
       type=str,
-      default='/DL_project/speech_commands/tmp/retrain_logs',
+      default='/dl_data/speech_commands/retrain_logs',
       help='Where to save summary logs for TensorBoard.')
   parser.add_argument(
       '--wanted_words',
@@ -390,7 +390,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--train_dir',
       type=str,
-      default='/DL_project/speech_commands/tmp/speech_commands_train',
+      default='/dl_data/speech_commands/speech_commands_train',
       help='Directory to write event logs and checkpoint.')
   parser.add_argument(
       '--save_step_interval',
