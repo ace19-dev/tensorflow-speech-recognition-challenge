@@ -1,4 +1,4 @@
-# Kaggle-Competitions
+# Kaggle Competitions
 ## TensorFlow Speech Recognition Challenge
 - https://www.kaggle.com/c/tensorflow-speech-recognition-challenge
 - In this competition, you're challenged to use the Speech Commands Dataset to build an algorithm that understands simple spoken commands.
