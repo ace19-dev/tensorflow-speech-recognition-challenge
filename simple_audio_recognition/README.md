@@ -4,7 +4,7 @@
 ## tuning point
 ### hyperparameter tuning
 - learning rate
-- 
+- batch size
 
 ### custom training data 
 - create custom training data
