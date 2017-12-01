@@ -15,5 +15,6 @@
   - You'll need to make sure that all your training data contains the right audio in the initial portion of the clip though.
 
 ### customizing the model
+- create custom conv
 - low_latency_conv
 - low_latency_svdf
