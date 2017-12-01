@@ -8,6 +8,7 @@
 
 ### custom training data 
 - create custom training data
+  - augmentation
 - add background noise
 - time shifting
 - Other parameters to customize
