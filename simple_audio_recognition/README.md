@@ -2,6 +2,8 @@
 - https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/speech_commands
 
 ## tuning point
+- For more advanced speech systems, I recommend looking into Kaldi(?)
+
 ### hyperparameter tuning
 - learning rate
 - batch size
