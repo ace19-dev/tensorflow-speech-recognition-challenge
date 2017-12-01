@@ -3,8 +3,11 @@
 
 ## How does this Model Work?
 - The architecture used in this tutorial is based on some described in the paper Convolutional Neural Networks for Small-footprint Keyword Spotting. (http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
-  - we limit the number of multiplications
-  - we limit the number of parameters
+  - we must limit the overall computation 
+    - we limit the number of multiplications
+    - we limit the number of parameters
+  - Must have a small memory footprint and low computational power.
+  - spectral representations of speech have strong correlations in time and frequency
 
 ## tuning point
 - For more advanced speech systems, I recommend looking into Kaldi(?)
