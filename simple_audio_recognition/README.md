@@ -14,7 +14,6 @@
     - limit the number of multiplies is to have one convolutional layer rather than two conv layer
     - have the time filter span all of time.
   - we limit the number of parameters
-    - 
 - Must have a small memory footprint and low computational power.
 - spectral representations of speech have strong correlations in time and frequency
 
@@ -31,14 +30,12 @@
 - image augmentation?
 
 ### Unknown Class
--
 
 ### Background Noise
 - add background noise (helps add some realism to the training)
 - you can supply your own audio clips in the _background_noise_ folder
 
 ### Silence
-- 
 
 ### time shifting
 - Audio time stretching and pitch scaling
