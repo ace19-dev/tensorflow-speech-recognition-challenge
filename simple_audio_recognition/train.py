@@ -25,6 +25,7 @@ detection style to spot discrete words from a small vocabulary, consisting of
 "yes", "no", "up", "down", "left", "right", "on", "off", "stop", and "go".
 To run the training process, use:
 bazel run tensorflow/examples/speech_commands:train
+
 This will write out checkpoints to /tmp/speech_commands_train/, and will
 download over 1GB of open source training data, so you'll need enough free space
 and a good internet connection. The default data is a collection of thousands of
@@ -283,7 +284,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='/dl_data/speech_commands/speech_dataset/',
+      default='/home/acemc19/dl_data/speech_commands/speech_dataset/',
       help="""\
       Where to download the speech training data to.
       """)
@@ -380,7 +381,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--summaries_dir',
       type=str,
-      default='/dl_data/speech_commands/retrain_logs',
+      default='/home/acemc19/dl_data/speech_commands/retrain_logs',
       help='Where to save summary logs for TensorBoard.')
   parser.add_argument(
       '--wanted_words',
@@ -390,7 +391,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--train_dir',
       type=str,
-      default='/dl_data/speech_commands/speech_commands_train',
+      default='/home/acemc19/dl_data/speech_commands/speech_commands_train',
       help='Directory to write event logs and checkpoint.')
   parser.add_argument(
       '--save_step_interval',
