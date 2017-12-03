@@ -22,9 +22,7 @@
 - For more advanced speech systems, I recommend looking into Kaldi(?)
 
 ### customizing the model
-- create custom conv
-- low_latency_conv
-- low_latency_svdf
+- create custom conv (low_latency_conv, low_latency_svdf)
 - Other parameters to customize
   - tweak the spectrogram creation parameters
   - If you make the input smaller, the model will need fewer computations to process it
