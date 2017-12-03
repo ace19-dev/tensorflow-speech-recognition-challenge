@@ -2,7 +2,7 @@
 
 ## Team name
 - Awesome-101
-- 
+- A4
 
 ## TensorFlow Speech Recognition Challenge
 - https://www.kaggle.com/c/tensorflow-speech-recognition-challenge
@@ -39,9 +39,25 @@
 - <b>대표적인 네트웍인 CNN 을 사용한다면, 어떻게 음성 데이터를 전처리할 수 있을까?? (main idea: Wave -> spectrogram)</b>
 - 시간축이 포함된 데이터 인데 RNN 네트웍을 사용하는것이 더 좋은 방법이 아닐까??
 - 또 다른 방법은 어떤것이 있을까? (WaveNet)
+- 학습데이터를 손실없이 효과적으로 줄일 수 있는 방법은?
+- 실 생활 데이터에서 음성만 추출할 수 있는 방법은?
+
 
 ## Solutions
 - http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
 - https://svds.com/tensorflow-rnn-tutorial/
+	- github: https://github.com/silicon-valley-data-science/RNN-Tutorial
+	- Several key improvements that have been made by the Microsoft team and other researchers in the past 4 years include:
+		- using language models on top of character based RNNs
+		- using convolutional neural nets (CNNs) for extracting features from the audio
+		- ensemble models that utilize multiple RNNs
+	- Computation and Language
+		- Towards End-to-End Speech Recognition with Deep Convolutional Neural Network
+			- https://arxiv.org/abs/1701.02720
+		- The Microsoft 2016 Conversational Speech Recognition System
+			- https://arxiv.org/abs/1609.03528
 - https://deepmind.com/blog/wavenet-generative-model-raw-audio/
-
+	- Pixel RNN
+		- https://arxiv.org/abs/1601.06759
+	- Pixel CNN
+		- https://arxiv.org/abs/1606.05328
