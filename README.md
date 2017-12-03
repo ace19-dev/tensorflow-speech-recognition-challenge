@@ -36,8 +36,8 @@
 
 ## Question
 - 어떤 방법으로 음성 데이터를 분류할 수 있을까??
-- <b>대표적인 네트웍인 CNN 을 사용한다면, 어떻게 음성 데이터를 전처리할 수 있을까?? (main idea: Wave -> spectrogram)</b>
-  It's solved that issue by defining a window of time we believe our spoken words should fit into, and converting the audio signal in that window into an image.
+- 대표적인 네트웍인 CNN 을 사용한다면, 어떻게 음성 데이터를 전처리할 수 있을까?? (main idea: Wave -> spectrogram)
+  - It's solved that issue by defining a window of time we believe our spoken words should fit into, and converting the audio signal in that window into an image.
 - 비록 짧은 단어지만 시간 feature 가 포함되어 있는데, RNN 계열의 네트웍을 사용하는것이 더 좋은 방법이 아닐까??
 - 또 다른 방법은 어떤것이 있을까? (WaveNet)
 
