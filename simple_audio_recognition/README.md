@@ -17,28 +17,9 @@
 - Must have a small memory footprint and low computational power.
 - spectral representations of speech have strong correlations in time and frequency
 
+
 ## tuning point
 - For more advanced speech systems, I recommend looking into Kaldi(?)
-
-### hyper-parameter tuning
-- learning rate
-- batch size
-
-### custom training data 
-- you can also supply your own training data
-- you can look at word alignment tools to standardize them (https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/)
-- image augmentation?
-
-### Unknown Class
-
-### Background Noise
-- add background noise (helps add some realism to the training)
-- you can supply your own audio clips in the _background_noise_ folder
-
-### Silence
-
-### time shifting
-- Audio time stretching and pitch scaling
 
 ### customizing the model
 - create custom conv
@@ -51,3 +32,22 @@
   - --dct_coefficient_count
   - --window_size_ms
   - --clip_duration_ms
+  
+### custom training data 
+- you can also supply your own training data
+- you can look at word alignment tools to standardize them (https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/)
+- image augmentation?
+- Unknown Class
+- Background Noise
+  - add background noise (helps add some realism to the training)
+  - you can supply your own audio clips in the _background_noise_ folder
+- Silence
+- time shifting
+  - Audio time stretching and pitch scaling
+
+### hyper-parameter tuning
+- learning rate
+- batch size
+
+
+
