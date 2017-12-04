@@ -30,7 +30,8 @@
   - --dct_coefficient_count
   - --window_size_ms
   - --clip_duration_ms
-  
+- Implement other conv (by using recent paper)
+
 ### custom training data 
 - you can also supply your own training data
 - you can look at word alignment tools to standardize them (https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/)
