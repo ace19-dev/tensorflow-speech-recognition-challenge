@@ -1,11 +1,7 @@
 # Kaggle Competitions
 
 ## Team name
-- ZeroToAll
-- A4
-- AIR Jordan
-- Walking through the forest of Deep Learning
-- Fantastic 4
+- AIR-Jordan
 
 ## TensorFlow Speech Recognition Challenge
 - https://www.kaggle.com/c/tensorflow-speech-recognition-challenge
@@ -47,6 +43,7 @@
 
 
 ## Solutions
+- http://www.kiranjose.in/blogs/getting-started-with-tensorflow-speech-recognition-api-and-object-detection-api/
 - http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
 - https://svds.com/tensorflow-rnn-tutorial/
 	- github: https://github.com/silicon-valley-data-science/RNN-Tutorial

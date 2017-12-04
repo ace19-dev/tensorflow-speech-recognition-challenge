@@ -21,7 +21,7 @@
 ## tuning point
 - For more advanced speech systems, I recommend looking into Kaldi(?)
 
-### customizing the model
+### customizing the model - by Kim-SungIl, hongym7 (~목요일)
 - create custom conv (low_latency_conv, low_latency_svdf)
 - Other parameters to customize
   - tweak the spectrogram creation parameters
@@ -32,10 +32,10 @@
   - --clip_duration_ms
 - Implement other conv (by using recent paper)
 
-### custom training data 
+### custom training data - by ziippy (~목요일)
 - you can also supply your own training data
-- you can look at word alignment tools to standardize them (https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/)
-- image augmentation?
+- <b>you can look at word alignment tools to standardize them (https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/)</b>
+- image augmentation? audio augmentation?
 - Unknown Class
 - Background Noise
   - add background noise (helps add some realism to the training)
@@ -44,7 +44,7 @@
 - time shifting
   - Audio time stretching and pitch scaling
 
-### hyper-parameter tuning
+### hyper-parameter tuning - by hongym7
 - learning rate
 - batch size
 
