@@ -1,7 +1,7 @@
 # Kaggle Competitions
 
 ## Team name
-- AIR Jordan
+- AIR-Jordan
 
 ## TensorFlow Speech Recognition Challenge
 - https://www.kaggle.com/c/tensorflow-speech-recognition-challenge
