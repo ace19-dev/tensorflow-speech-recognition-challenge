@@ -11,7 +11,7 @@
 ## 참여 팀원 소개 (필수: 이름, 약력, 연락처, 개인별 github 주소)
 | 이름 | 약력 | 연락처 | github 주소 |
 |---|---|---|---|
-| 김성연 | 2011~현재: sk c&c 융합개발기기술팀 수석 | 010-8836-7348 |  https://github.com/ace19-dev  |
+| 김성연 | 2011~현재: sk c&c 융합개발기술팀 수석 | 010-8836-7348 |  https://github.com/ace19-dev  |
 | 김종성 |   |   | https://github.com/ziippy  |
 | 홍용만 |   |   | https://github.com/hongym7  |
 | 김성일 |   |   | https://github.com/Kim-SungIl  |
