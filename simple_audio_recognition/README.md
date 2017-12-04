@@ -32,7 +32,7 @@
   - --clip_duration_ms
 - Implement other conv (by using recent paper)
 
-### custom training data 
+### custom training data - by 김종X
 - you can also supply your own training data
 - <b>you can look at word alignment tools to standardize them (https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/)</b>
 - image augmentation? audio augmentation?
