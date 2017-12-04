@@ -1,11 +1,7 @@
 # Kaggle Competitions
 
 ## Team name
-- ZeroToAll
-- A4
 - AIR Jordan
-- Walking through the forest of Deep Learning
-- Fantastic 4
 
 ## TensorFlow Speech Recognition Challenge
 - https://www.kaggle.com/c/tensorflow-speech-recognition-challenge
