@@ -284,7 +284,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='/home/acemc19/dl_data/speech_commands/speech_dataset/',
+      default='../../tmp/speech_commands/speech_dataset/',
       help="""\
       Where to download the speech training data to.
       """)
@@ -381,7 +381,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--summaries_dir',
       type=str,
-      default='/home/acemc19/dl_data/speech_commands/retrain_logs',
+      default='../../tmp/speech_commands/retrain_logs',
       help='Where to save summary logs for TensorBoard.')
   parser.add_argument(
       '--wanted_words',
@@ -391,7 +391,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--train_dir',
       type=str,
-      default='/home/acemc19/dl_data/speech_commands/speech_commands_train',
+      default='../../tmp/speech_commands/speech_commands_train',
       help='Directory to write event logs and checkpoint.')
   parser.add_argument(
       '--save_step_interval',
