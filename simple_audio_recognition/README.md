@@ -34,7 +34,7 @@
 
 ### custom training data 
 - you can also supply your own training data
-- you can look at word alignment tools to standardize them (https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/)
+- <b>you can look at word alignment tools to standardize them (https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/)</b>
 - image augmentation? audio augmentation?
 - Unknown Class
 - Background Noise
