@@ -1,7 +1,7 @@
 # Kaggle Competitions
 
 ## Team name
-- Awesome-101
+- ZeroToAll
 - A4
 - AIR Jordan
 - Walking through the forest of Deep Learning
