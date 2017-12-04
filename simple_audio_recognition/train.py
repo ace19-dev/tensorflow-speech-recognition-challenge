@@ -305,7 +305,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--silence_percentage',
       type=float,
-      default=15.0,
+      default=10.0,
       help="""\
       How much of the training data should be silence.
       """)
