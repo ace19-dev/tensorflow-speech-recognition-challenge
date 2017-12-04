@@ -1,5 +1,5 @@
 ## 팀명
-- AIR-Jordan (AI + AR)
+- AIR-Jordan
 
 ## 대표자 이름/소속
 - 김성연/SK 주식회사 C&C
