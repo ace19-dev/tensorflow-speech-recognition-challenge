@@ -226,14 +226,14 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   first_bias = tf.Variable(tf.zeros([first_filter_count]))
   first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 1, 1, 1],
                             'SAME') + first_bias
-  first_conv = BatchNorm(first_conv, is_training, name='bn1')
+  #first_conv = BatchNorm(first_conv, is_training, name='bn1')
   first_relu = tf.nn.relu(first_conv)
   #first_relu = LeakyReLU(first_conv)
-  #if is_training:
-    #first_dropout = tf.nn.dropout(first_relu, dropout_prob)
-  #else:
-    #first_dropout = first_relu
-  max_pool = tf.nn.max_pool(first_relu, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+  if is_training:
+    first_dropout = tf.nn.dropout(first_relu, dropout_prob)
+  else:
+    first_dropout = first_relu
+  max_pool = tf.nn.max_pool(first_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
 
 
   #first_first_conv =
@@ -257,14 +257,14 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   second_conv = tf.nn.conv2d(max_pool, second_weights, [1, 1, 1, 1],
                              'SAME') + second_bias
 
-  second_conv = BatchNorm(second_conv, is_training, name='bn2')
+  #second_conv = BatchNorm(second_conv, is_training, name='bn2')
   second_relu = tf.nn.relu(second_conv)
   #second_relu = LeakyReLU(second_conv)
-#  if is_training:
-#    second_dropout = tf.nn.dropout(second_relu, dropout_prob)
-#  else:
-#    second_dropout = second_relu
-  second_conv_shape = second_relu.get_shape()
+  if is_training:
+    second_dropout = tf.nn.dropout(second_relu, dropout_prob)
+  else:
+    second_dropout = second_relu
+  second_conv_shape = second_dropout.get_shape()
   second_conv_output_width = second_conv_shape[2]
   second_conv_output_height = second_conv_shape[1]
   second_conv_element_count = int(
