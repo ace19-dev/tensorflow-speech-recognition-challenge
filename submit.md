@@ -18,7 +18,7 @@
 
 
 ## 제안하는 알고리즘 (어떤 방향으로 문제를 풀 예정인가요?)
-- low latency conv 논문 리서치해서 github 찾을것
+- low latency conv 논문 리서치해서 github 찾을 것.
   - Sufficiently high accuracy
   - Low computational complexity
   - Low energy usage
