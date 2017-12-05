@@ -19,5 +19,9 @@
 
 ## 제안하는 알고리즘 (어떤 방향으로 문제를 풀 예정인가요?)
 - low latency conv 논문 리서치해서 github 찾을것
+  - Sufficiently high accuracy
+  - Low computational complexity
+  - Low energy usage
+  - Small model size
 - data pre-processing 구체적으로 작성 (2~3가지)
-기
+
