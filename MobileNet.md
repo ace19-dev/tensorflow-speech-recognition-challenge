@@ -53,6 +53,10 @@
 - Width Multiplier: Conv. 필터수(채널)를 적게 만들고 돌려보겠다 라는 의미
 - Resolution Multiplier: 입력 이미지의 가로/세로를 줄여서 입력하겠다 라는 의미
 
+## implementation
+- tensorflow 공식 github 의 models 에 slim 모델 참고
+- slim.seperable_convolution2d
+
 ## reference
 - https://www.youtube.com/watch?v=7UoOFKcyIvM&index=45&list=PLlMkM4tgfjnJhhd4wn5aj8fVTYJwIpWkS
 
