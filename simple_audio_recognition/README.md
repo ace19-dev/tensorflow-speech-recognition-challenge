@@ -45,8 +45,13 @@
   - Audio time stretching and pitch scaling
 
 ### hyper-parameter tuning - by hongym7
-- learning rate
-- batch size
+- Learning Rate
+- Cost Function
+- Regularization parameter
+- Multi batch size
+- Traning repeat
+- Hidden unit/layer
+- Weight initialization
 
 
 
