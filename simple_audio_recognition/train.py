@@ -13,21 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 r"""Simple speech recognition to spot a limited number of keywords.
-
 This is a self-contained example script that will train a very basic audio
 recognition model in TensorFlow. It downloads the necessary training data and
 runs with reasonable defaults to train within a few hours even only using a CPU.
 For more information, please see
 https://www.tensorflow.org/tutorials/audio_recognition.
-
 It is intended as an introduction to using neural networks for audio
 recognition, and is not a full speech recognition system. For more advanced
 speech systems, I recommend looking into Kaldi. This network uses a keyword
 detection style to spot discrete words from a small vocabulary, consisting of
 "yes", "no", "up", "down", "left", "right", "on", "off", "stop", and "go".
-
 To run the training process, use:
-
 bazel run tensorflow/examples/speech_commands:train
 
 This will write out checkpoints to /tmp/speech_commands_train/, and will
@@ -36,15 +32,12 @@ and a good internet connection. The default data is a collection of thousands of
 one-second .wav files, each containing one spoken word. This data set is
 collected from https://aiyprojects.withgoogle.com/open_speech_recording, please
 consider contributing to help improve this and other models!
-
 As training progresses, it will print out its accuracy metrics, which should
 rise above 90% by the end. Once it's complete, you can run the freeze script to
 get a binary GraphDef that you can easily deploy on mobile applications.
-
 If you want to train on your own data, you'll need to create .wavs with your
 recordings, all at a consistent length, and then arrange them into subfolders
 organized by label. For example, here's a possible file structure:
-
 my_wavs >
   up >
     audio_0.wav
@@ -55,16 +48,12 @@ my_wavs >
   other>
     audio_4.wav
     audio_5.wav
-
 You'll also need to tell the script what labels to look for, using the
 `--wanted_words` argument. In this case, 'up,down' might be what you want, and
 the audio in the 'other' folder would be used to train an 'unknown' category.
-
 To pull this all together, you'd run:
-
 bazel run tensorflow/examples/speech_commands:train -- \
 --data_dir=my_wavs --wanted_words=up,down
-
 """
 from __future__ import absolute_import
 from __future__ import division
@@ -144,12 +133,15 @@ def main(_):
 
   # Create the back propagation and training evaluation machinery in the graph.
   with tf.name_scope('cross_entropy'):
-    cross_entropy_mean = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=ground_truth_input, logits=logits))
+    cross_entropy_mean = tf.reduce_mean(
+        tf.nn.softmax_cross_entropy_with_logits(
+            labels=ground_truth_input, logits=logits))
   tf.summary.scalar('cross_entropy', cross_entropy_mean)
   with tf.name_scope('train'), tf.control_dependencies(control_dependencies):
     learning_rate_input = tf.placeholder(
         tf.float32, [], name='learning_rate_input')
-    train_step = tf.train.GradientDescentOptimizer( learning_rate_input).minimize(cross_entropy_mean)
+    train_step = tf.train.GradientDescentOptimizer(
+        learning_rate_input).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
   expected_indices = tf.argmax(ground_truth_input, 1)
   correct_prediction = tf.equal(predicted_indices, expected_indices)
@@ -292,7 +284,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='/tmp/speech_dataset/',
+      default='../../tmp/speech_commands/speech_dataset/',
       help="""\
       Where to download the speech training data to.
       """)
@@ -389,7 +381,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--summaries_dir',
       type=str,
-      default='/tmp/retrain_logs',
+      default='../../tmp/speech_commands/retrain_logs',
       help='Where to save summary logs for TensorBoard.')
   parser.add_argument(
       '--wanted_words',
@@ -399,7 +391,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--train_dir',
       type=str,
-      default='/tmp/speech_commands_train',
+      default='../../tmp/speech_commands/speech_commands_train',
       help='Directory to write event logs and checkpoint.')
   parser.add_argument(
       '--save_step_interval',
