@@ -30,7 +30,7 @@
 - <b>Distillation & Compression</b>
 
 ## key Idea
-- 이 논문의 kep idea 는 Depthwise Separable Convolutions 을 사용하겠다.
+- 이 논문의 kep idea 는 <b>Depthwise Separable Convolutions</b> 을 사용하겠다.
   - 성능도 괜찮고 슬림한 네트웍을 만들 수 있다.
 
 ## Recap
@@ -44,7 +44,7 @@
 - Why should we always consider all channels?
 
 ## Depthwise Separable Convolution
-- 기존 conv. 는 채널을 다 고려해서 연산을 하지만, 한 채널씩 떼어서 연산.
+- 기존 conv. 는 채널을 다 고려해서 연산을 하지만, 여기에선 한 채널씩 떼어서 연산.
 - Depthwise Conv. + Pointwise Conv.(1x1 Conv.)
 - 채널방향과 w/h 방향을 분리해서 연산.
 - 만약 3x3 depthwise separable convolutions 사용하면, 8~9 배의 연산량을 줄일 수 있다.
