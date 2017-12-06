@@ -358,19 +358,9 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
                             'SAME') + first_bias
 
   first_bn = BatchNorm(first_conv, is_training, name='bn1')
-
   first_relu = tf.nn.relu(first_bn)
 
-  #if is_training:
-    #first_dropout = tf.nn.dropout(first_relu, dropout_prob)
-  #else:
-    #first_dropout = first_relu
-
   print('after first_relu', first_relu)
-
-  max_pool = tf.nn.max_pool(first_relu, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
-
-  print('after max_pool', max_pool)
 
   second_filter_width = 1
   second_filter_height = 1
@@ -381,21 +371,18 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
     initializer=tf.contrib.layers.xavier_initializer())
 
   second_bias = tf.Variable(tf.zeros([second_filter_count]))
-  second_conv = tf.nn.conv2d(max_pool, second_weights, [1, 1, 1, 1],
+  second_conv = tf.nn.conv2d(first_relu, second_weights, [1, 1, 1, 1],
                              'SAME') + second_bias
 
   print('after second_conv', second_conv)
 
-
   second_bn = BatchNorm(second_conv, is_training, name='bn2')
   second_relu = tf.nn.relu(second_bn)
 
-#  if is_training:
-#    second_dropout = tf.nn.dropout(second_relu, dropout_prob)
-#  else:
-#    second_dropout = second_relu
 
-  second_conv_shape = second_relu.get_shape()
+  max_pool = tf.nn.avg_pool(second_relu, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+
+  second_conv_shape = max_pool.get_shape()
   second_conv_output_width = second_conv_shape[2] # 20
   second_conv_output_height = second_conv_shape[1] # 33
 
@@ -406,7 +393,7 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
       second_conv_output_width * second_conv_output_height *
       second_filter_count)
 
-  flattened_second_conv = tf.reshape(second_relu,
+  flattened_second_conv = tf.reshape(max_pool,
                                      [-1, second_conv_element_count])
 
 
