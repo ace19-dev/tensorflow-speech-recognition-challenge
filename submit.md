@@ -13,7 +13,7 @@
 |---|---|---|---|
 | 김성연 | 2011~현재: SK 주식회사 C&C 융합서비스개발그룹 수석 | 010-8836-7348 | https://github.com/ace19-dev  |
 | 김종성 |   |   | https://github.com/ziippy  |
-| 홍용만 |   |   | https://github.com/hongym7  |
+| 홍용만 | 2011~현재: SK 주식회사 C&C 융합서비스개발그룹 선임 | 010-2882-7354  | https://github.com/hongym7  |
 | 김성일 | 2016~현재: SK 주식회사 C&C 융합서비스개발그룹 선임 | 010-3275-2578  | https://github.com/Kim-SungIl  |
 
 
