@@ -335,6 +335,9 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   input_frequency_size = model_settings['dct_coefficient_count']
   input_time_size = model_settings['spectrogram_length']
   fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size, input_frequency_size, 1])
+
+  print('... ')
+  print('... ')
   print('after fingerprint_4d', fingerprint_4d)
 
 
@@ -343,14 +346,17 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   first_filter_width = 3
   first_filter_height = 3
   first_filter_count = 32
+
+  first_weights = tf.get_variable("first_weights",
+    shape=[first_filter_height, first_filter_width, 1, first_filter_count],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+
+
 #  first_weights = tf.Variable(
 #      tf.truncated_normal(
 #          [first_filter_height, first_filter_width, 1, first_filter_count],
 #          stddev=0.01))
-
-  first_weights = tf.get_variable("W1", shape=[first_filter_height, first_filter_width, 1,
-                first_filter_count], initializer=tf.contrib.layers.xavier_initializer())
-
 
   print('after first_weights', first_weights)
 
@@ -365,9 +371,21 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   else:
     first_dropout = first_relu
 
+  print('after first_dropout', first_dropout)
+
+  max_pool = tf.nn.max_pool(first_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+
+  print('after max_pool', max_pool)
+
   second_filter_width = 1
   second_filter_height = 1
   second_filter_count = 64
+
+  second_weights = tf.get_variable("second_weights",
+    shape=[second_filter_height, second_filter_width, first_filter_count, second_filter_count],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+
 #  second_weights = tf.Variable(
 #      tf.truncated_normal(
 #          [
@@ -376,12 +394,8 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
 #          ],
 #          stddev=0.01))
 
-  second_weights = tf.get_variable("W2", shape=[second_filter_height, second_filter_width, first_filter_count,
-                second_filter_count], initializer=tf.contrib.layers.xavier_initializer())
-                
-
   second_bias = tf.Variable(tf.zeros([second_filter_count]))
-  second_conv = tf.nn.conv2d(first_dropout, second_weights, [1, 1, 1, 1],
+  second_conv = tf.nn.conv2d(max_pool, second_weights, [1, 1, 1, 1],
                              'SAME') + second_bias
 
   print('after second_conv', second_conv)
@@ -391,12 +405,11 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
     second_dropout = tf.nn.dropout(second_relu, dropout_prob)
   else:
     second_dropout = second_relu
-
-  avg_pool = tf.nn.avg_pool(second_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
-
-  second_conv_shape = avg_pool.get_shape()
+  second_conv_shape = second_dropout.get_shape()
   second_conv_output_width = second_conv_shape[2] # 20
   second_conv_output_height = second_conv_shape[1] # 33
+
+  print('after second_dropout', second_dropout)
 
   # second_conv_element_count = 42240
   second_conv_element_count = int(
@@ -405,6 +418,9 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
 
   flattened_second_conv = tf.reshape(second_dropout,
                                      [-1, second_conv_element_count])
+
+
+  print('after flattened_second_conv', flattened_second_conv)
 
 
   # label_count = 12 = x + 2
