@@ -351,29 +351,24 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
     shape=[first_filter_height, first_filter_width, 1, first_filter_count],
     initializer=tf.contrib.layers.xavier_initializer())
 
-
-
-#  first_weights = tf.Variable(
-#      tf.truncated_normal(
-#          [first_filter_height, first_filter_width, 1, first_filter_count],
-#          stddev=0.01))
-
   print('after first_weights', first_weights)
 
   first_bias = tf.Variable(tf.zeros([first_filter_count]))
   first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 1, 1, 1],
                             'SAME') + first_bias
 
-  first_relu = tf.nn.relu(first_conv)
+  first_bn = BatchNorm(first_conv, is_training, name='bn1')
 
-  if is_training:
-    first_dropout = tf.nn.dropout(first_relu, dropout_prob)
-  else:
-    first_dropout = first_relu
+  first_relu = tf.nn.relu(first_bn)
 
-  print('after first_dropout', first_dropout)
+  #if is_training:
+    #first_dropout = tf.nn.dropout(first_relu, dropout_prob)
+  #else:
+    #first_dropout = first_relu
 
-  max_pool = tf.nn.max_pool(first_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+  print('after first_relu', first_relu)
+
+  max_pool = tf.nn.max_pool(first_relu, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
 
   print('after max_pool', max_pool)
 
@@ -385,38 +380,33 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
     shape=[second_filter_height, second_filter_width, first_filter_count, second_filter_count],
     initializer=tf.contrib.layers.xavier_initializer())
 
-
-#  second_weights = tf.Variable(
-#      tf.truncated_normal(
-#          [
-#              second_filter_height, second_filter_width, first_filter_count,
-#              second_filter_count
-#          ],
-#          stddev=0.01))
-
   second_bias = tf.Variable(tf.zeros([second_filter_count]))
   second_conv = tf.nn.conv2d(max_pool, second_weights, [1, 1, 1, 1],
                              'SAME') + second_bias
 
   print('after second_conv', second_conv)
 
-  second_relu = tf.nn.relu(second_conv)
-  if is_training:
-    second_dropout = tf.nn.dropout(second_relu, dropout_prob)
-  else:
-    second_dropout = second_relu
-  second_conv_shape = second_dropout.get_shape()
+
+  second_bn = BatchNorm(second_conv, is_training, name='bn2')
+  second_relu = tf.nn.relu(second_bn)
+
+#  if is_training:
+#    second_dropout = tf.nn.dropout(second_relu, dropout_prob)
+#  else:
+#    second_dropout = second_relu
+
+  second_conv_shape = second_relu.get_shape()
   second_conv_output_width = second_conv_shape[2] # 20
   second_conv_output_height = second_conv_shape[1] # 33
 
-  print('after second_dropout', second_dropout)
+  print('after second_relu', second_relu)
 
   # second_conv_element_count = 42240
   second_conv_element_count = int(
       second_conv_output_width * second_conv_output_height *
       second_filter_count)
 
-  flattened_second_conv = tf.reshape(second_dropout,
+  flattened_second_conv = tf.reshape(second_relu,
                                      [-1, second_conv_element_count])
 
 
