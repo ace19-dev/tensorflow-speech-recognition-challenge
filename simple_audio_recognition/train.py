@@ -411,7 +411,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='conv',
+      default='hong',
       help='What model architecture to use')
   parser.add_argument(
       '--check_nans',
