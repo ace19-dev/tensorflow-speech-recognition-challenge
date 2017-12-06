@@ -367,9 +367,9 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
 
   print('after max pooling', max_pool)
 
-  second_filter_width = 3
-  second_filter_height = 3
-  second_filter_count = 32
+  second_filter_width = 1
+  second_filter_height = 1
+  second_filter_count = 64
   second_weights = tf.Variable(
       tf.truncated_normal(
           [
