@@ -111,8 +111,10 @@ def main(_):
         'lists, but are %d and %d long instead' % (len(training_steps_list),
                                                    len(learning_rates_list)))
 
+  #fingerprint_size : 2600
   fingerprint_input = tf.placeholder(
       tf.float32, [None, fingerprint_size], name='fingerprint_input')
+  #shape of fingerprint_input : [2, ]
 
   logits, dropout_prob = models.create_model(
       fingerprint_input,
@@ -123,6 +125,9 @@ def main(_):
   # Define loss and optimizer
   ground_truth_input = tf.placeholder(
       tf.float32, [None, label_count], name='groundtruth_input')
+
+  # shape of ground_truth_input : [2, ]
+  # print(tf.shape(ground_truth_input))
 
   # Optionally we can add runtime checks to spot when NaNs or other symptoms of
   # numerical errors start occurring during training.
@@ -291,7 +296,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.1,
+      default=0.2,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
@@ -326,7 +331,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--testing_percentage',
       type=int,
-      default=10,
+      default=15,
       help='What percentage of wavs to use as a test set.')
   parser.add_argument(
       '--validation_percentage',
@@ -351,7 +356,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--window_stride_ms',
       type=float,
-      default=10.0,
+      default=15.0,
       help='How long each spectrogram timeslice is',)
   parser.add_argument(
       '--dct_coefficient_count',
@@ -366,7 +371,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--eval_step_interval',
       type=int,
-      default=400,
+      default=1000,
       help='How often to evaluate the training results.')
   parser.add_argument(
       '--learning_rate',
@@ -396,7 +401,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--save_step_interval',
       type=int,
-      default=100,
+      default=500,
       help='Save model checkpoint every save_steps.')
   parser.add_argument(
       '--start_checkpoint',

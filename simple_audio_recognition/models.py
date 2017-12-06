@@ -216,6 +216,7 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   input_time_size = model_settings['spectrogram_length']
   fingerprint_4d = tf.reshape(fingerprint_input,
                               [-1, input_time_size, input_frequency_size, 1])
+
   first_filter_width = 8
   first_filter_height = 20
   first_filter_count = 64
@@ -234,14 +235,6 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   else:
     first_dropout = first_relu
   max_pool = tf.nn.max_pool(first_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
-
-
-  #first_first_conv =
-
-
-
-
-
 
   second_filter_width = 4
   second_filter_height = 10
@@ -265,13 +258,19 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   else:
     second_dropout = second_relu
   second_conv_shape = second_dropout.get_shape()
-  second_conv_output_width = second_conv_shape[2]
-  second_conv_output_height = second_conv_shape[1]
+  second_conv_output_width = second_conv_shape[2] # 20
+  second_conv_output_height = second_conv_shape[1] # 33
+
+  # second_conv_element_count = 42240
   second_conv_element_count = int(
       second_conv_output_width * second_conv_output_height *
       second_filter_count)
-  flattened_second_conv = tf.reshape(second_relu,
+
+  flattened_second_conv = tf.reshape(second_dropout,
                                      [-1, second_conv_element_count])
+
+
+  # label_count = 12 = x + 2
   label_count = model_settings['label_count']
   final_fc_weights = tf.Variable(
       tf.truncated_normal(
