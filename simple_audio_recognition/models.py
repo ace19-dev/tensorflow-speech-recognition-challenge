@@ -343,54 +343,58 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   first_filter_width = 3
   first_filter_height = 3
   first_filter_count = 32
-  first_weights = tf.Variable(
-      tf.truncated_normal(
-          [first_filter_height, first_filter_width, 1, first_filter_count],
-          stddev=0.01))
+#  first_weights = tf.Variable(
+#      tf.truncated_normal(
+#          [first_filter_height, first_filter_width, 1, first_filter_count],
+#          stddev=0.01))
+
+  first_weights = tf.get_variable("W1", shape=[first_filter_height, first_filter_width, 1,
+                first_filter_count], initializer=tf.contrib.layers.xavier_initializer())
+
 
   print('after first_weights', first_weights)
 
   first_bias = tf.Variable(tf.zeros([first_filter_count]))
   first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 1, 1, 1],
                             'SAME') + first_bias
-  #first_conv = BatchNorm(first_conv, is_training, name='bn1')
+
   first_relu = tf.nn.relu(first_conv)
-  #first_relu = LeakyReLU(first_conv)
+
   if is_training:
     first_dropout = tf.nn.dropout(first_relu, dropout_prob)
   else:
     first_dropout = first_relu
 
-  print('after first_dropout', first_dropout)
-
-  max_pool = tf.nn.max_pool(first_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
-
-  print('after max pooling', max_pool)
-
   second_filter_width = 1
   second_filter_height = 1
   second_filter_count = 64
-  second_weights = tf.Variable(
-      tf.truncated_normal(
-          [
-              second_filter_height, second_filter_width, first_filter_count,
-              second_filter_count
-          ],
-          stddev=0.01))
+#  second_weights = tf.Variable(
+#      tf.truncated_normal(
+#          [
+#              second_filter_height, second_filter_width, first_filter_count,
+#              second_filter_count
+#          ],
+#          stddev=0.01))
+
+  second_weights = tf.get_variable("W2", shape=[second_filter_height, second_filter_width, first_filter_count,
+                second_filter_count], initializer=tf.contrib.layers.xavier_initializer())
+                
+
   second_bias = tf.Variable(tf.zeros([second_filter_count]))
-  second_conv = tf.nn.conv2d(max_pool, second_weights, [1, 1, 1, 1],
+  second_conv = tf.nn.conv2d(first_dropout, second_weights, [1, 1, 1, 1],
                              'SAME') + second_bias
 
   print('after second_conv', second_conv)
 
-  #second_conv = BatchNorm(second_conv, is_training, name='bn2')
   second_relu = tf.nn.relu(second_conv)
-  #second_relu = LeakyReLU(second_conv)
   if is_training:
     second_dropout = tf.nn.dropout(second_relu, dropout_prob)
   else:
     second_dropout = second_relu
-  second_conv_shape = second_dropout.get_shape()
+
+  avg_pool = tf.nn.avg_pool(second_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+
+  second_conv_shape = avg_pool.get_shape()
   second_conv_output_width = second_conv_shape[2] # 20
   second_conv_output_height = second_conv_shape[1] # 33
 
