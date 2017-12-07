@@ -286,48 +286,28 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
 
 
 def create_hong_model(fingerprint_input, model_settings, is_training):
-  """Builds a standard convolutional model.
+  """
+        Conv / s2
 
-  Here's the layout of the graph:
+        BN
 
-  (fingerprint_input)
-          v
-      [Conv2D]<-(weights)
-          v
-      [BiasAdd]<-(bias)
-          v
-        [Relu]
-          v
-      [MaxPool]
-          v
-      [Conv2D]<-(weights)
-          v
-      [BiasAdd]<-(bias)
-          v
-        [Relu]
-          v
-      [MaxPool]
-          v
-      [MatMul]<-(weights)
-          v
-      [BiasAdd]<-(bias)
-          v
+        Relu
 
-  This produces fairly good quality results, but can involve a large number of
-  weight parameters and computations. For a cheaper alternative from the same
-  paper with slightly less accuracy, see 'low_latency_conv' below.
+        Conv dw / s1
 
-  During training, dropout nodes are introduced after each relu, controlled by a
-  placeholder.
+        BN
 
-  Args:
-    fingerprint_input: TensorFlow node that will output audio feature vectors.
-    model_settings: Dictionary of information about the model.
-    is_training: Whether the model is going to be used for training.
+        Relu
 
-  Returns:
-    TensorFlow node outputting logits results, and optionally a dropout
-    placeholder.
+        Conv / s1
+
+        BN
+
+        Relu
+
+        Avg Pooling
+
+
   """
 
   if is_training:
@@ -340,8 +320,7 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   print('... ')
   print('after fingerprint_4d', fingerprint_4d)
 
-
-
+  # Conv / s2
 
   first_filter_width = 3
   first_filter_height = 3
@@ -354,59 +333,81 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   print('after first_weights', first_weights)
 
   first_bias = tf.Variable(tf.zeros([first_filter_count]))
-  first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 1, 1, 1],
-                            'SAME') + first_bias
+  first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 2, 2, 1],
+                            'VALID') + first_bias
 
   first_bn = BatchNorm(first_conv, is_training, name='bn1')
   first_relu = tf.nn.relu(first_bn)
 
   print('after first_relu', first_relu)
 
-  second_filter_width = 1
-  second_filter_height = 1
-  second_filter_count = 64
+
+  # Conv dw / s1
+
+  deepwise_filter_width = 3
+  deepwise_filter_height = 3
+  deepwise_filter_channel = 32
+  deepwise_filter_count = 32
 
   second_weights = tf.get_variable("second_weights",
-    shape=[second_filter_height, second_filter_width, first_filter_count, second_filter_count],
+    shape=[deepwise_filter_height, deepwise_filter_width, deepwise_filter_channel, deepwise_filter_count],
     initializer=tf.contrib.layers.xavier_initializer())
 
-  second_bias = tf.Variable(tf.zeros([second_filter_count]))
-  second_conv = tf.nn.conv2d(first_relu, second_weights, [1, 1, 1, 1],
-                             'SAME') + second_bias
+  second_bias = tf.Variable(tf.zeros([deepwise_filter_count]))
 
-  print('after second_conv', second_conv)
+  second_conv = tf.nn.conv2d(first_relu, second_weights, [1, 1, 1, 1],
+                            'VALID') + second_bias
 
   second_bn = BatchNorm(second_conv, is_training, name='bn2')
   second_relu = tf.nn.relu(second_bn)
 
+  third_filter_width = 1
+  third_filter_height = 1
+  third_filter_count = 64
 
-  max_pool = tf.nn.avg_pool(second_relu, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+  third_weights = tf.get_variable("third_weights",
+    shape=[third_filter_height, third_filter_width, deepwise_filter_count, third_filter_count],
+    initializer=tf.contrib.layers.xavier_initializer())
 
-  second_conv_shape = max_pool.get_shape()
-  second_conv_output_width = second_conv_shape[2] # 20
-  second_conv_output_height = second_conv_shape[1] # 33
+  third_bias = tf.Variable(tf.zeros([third_filter_count]))
 
-  print('after second_relu', second_relu)
+  third_conv = tf.nn.conv2d(second_relu, third_weights, [1, 1, 1, 1],
+                             'SAME') + third_bias
+
+  print('after third_conv', third_conv)
+
+  third_bn = BatchNorm(third_conv, is_training, name='bn3')
+  third_relu = tf.nn.relu(third_bn)
+
+  max_pool = tf.nn.avg_pool(third_relu, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+
+  third_conv_shape = max_pool.get_shape()
+  third_conv_output_width = third_conv_shape[2] # 20
+  third_conv_output_height = third_conv_shape[1] # 33
+
+  print('after third_relu', third_relu)
 
   # second_conv_element_count = 42240
-  second_conv_element_count = int(
-      second_conv_output_width * second_conv_output_height *
-      second_filter_count)
+  third_conv_element_count = int(
+      third_conv_output_width * third_conv_output_height *
+      third_filter_count)
 
-  flattened_second_conv = tf.reshape(max_pool,
-                                     [-1, second_conv_element_count])
+  flattened_third_conv = tf.reshape(max_pool,
+                                     [-1, third_conv_element_count])
 
-
-  print('after flattened_second_conv', flattened_second_conv)
-
+  print('after flattened_third_conv', flattened_third_conv)
 
   # label_count = 12 = x + 2
   label_count = model_settings['label_count']
-  final_fc_weights = tf.Variable(
-      tf.truncated_normal(
-          [second_conv_element_count, label_count], stddev=0.01))
+
+  final_fc_weights = tf.get_variable("final_fc_weights",
+    shape=[third_conv_element_count, label_count],
+    initializer=tf.contrib.layers.xavier_initializer())
+
   final_fc_bias = tf.Variable(tf.zeros([label_count]))
-  final_fc = tf.matmul(flattened_second_conv, final_fc_weights) + final_fc_bias
+
+  final_fc = tf.matmul(flattened_third_conv, final_fc_weights) + final_fc_bias
+
   if is_training:
     return final_fc, dropout_prob
   else:
