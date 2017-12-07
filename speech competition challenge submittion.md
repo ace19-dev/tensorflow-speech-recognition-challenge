@@ -31,6 +31,10 @@
     - create the spectorgram png using by wav_to_spectrogram
     - each spectrogram png size change to same size
     - Augmentation
-      - pitch shift / time expanding
+      - pitch shift
+      - time expanding
+      - time_shift
+      - How loud the background noise
+      - Number of frequency bins to use for analysis
 
 
