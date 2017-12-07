@@ -19,7 +19,7 @@
 
 
 ## tuning point
-- For more advanced speech systems, I recommend looking into Kaldi(?)
+- To make more advanced speech systems..
 
 ### customizing the model - by Kim-SungIl, hongym7 (~목요일)
 - create custom conv (low_latency_conv, low_latency_svdf)
