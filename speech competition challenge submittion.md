@@ -19,7 +19,7 @@
 
 ## 제안하는 알고리즘 (어떤 방향으로 문제를 풀 예정인가요?)
 - We are looking for two workarounds.
-  - Small Conv model (MobileNet + speech command example network)
+  - Customize Small Conv Model (MobileNet + speech command example network)
     - Sufficiently high accuracy
     - Low computational complexity
     - Low energy usage
