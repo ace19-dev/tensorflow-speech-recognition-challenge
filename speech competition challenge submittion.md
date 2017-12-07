@@ -18,16 +18,17 @@
 
 
 ## 제안하는 알고리즘 (어떤 방향으로 문제를 풀 예정인가요?)
-- Small Conv model (MobileNet + speech command example)
-  - Sufficiently high accuracy
-  - Low computational complexity
-  - Low energy usage
-  - Small model size
+- We are looking for two workarounds.
+  - Small Conv model (MobileNet + speech command example network)
+    - Sufficiently high accuracy
+    - Low computational complexity
+    - Low energy usage
+    - Small model size
   
-- data pre-processing (Prepare a best spectrogram image for learing)
-  - wav volume normalization
-  - find the section of the word based on volume dB level efficiently
-  - create the spectorgram png using by wav_to_spectrogram
-  - each spectrogram png size change to same size
+  - data pre-processing (Prepare a best spectrogram image for learing)
+    - wav volume normalization
+    - find the section of the word based on volume dB level efficiently
+    - create the spectorgram png using by wav_to_spectrogram
+    - each spectrogram png size change to same size
 
 
