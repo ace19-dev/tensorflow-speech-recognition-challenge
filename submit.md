@@ -18,7 +18,7 @@
 
 
 ## 제안하는 알고리즘 (어떤 방향으로 문제를 풀 예정인가요?)
-- Small Conv model (ex. MobileNet)
+- Small Conv model (MobileNet + speech command example)
   - Sufficiently high accuracy
   - Low computational complexity
   - Low energy usage
