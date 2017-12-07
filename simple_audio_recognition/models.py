@@ -379,7 +379,7 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   third_bn = BatchNorm(third_conv, is_training, name='bn3')
   third_relu = tf.nn.relu(third_bn)
 
-  max_pool = tf.nn.avg_pool(third_relu, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+  max_pool = tf.nn.avg_pool(third_relu, [1, 3, 3, 1], [1, 1, 1, 1], 'SAME')
 
   third_conv_shape = max_pool.get_shape()
   third_conv_output_width = third_conv_shape[2] # 20
