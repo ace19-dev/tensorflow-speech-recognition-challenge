@@ -28,6 +28,9 @@
         - 3x3 depthwise separable convoutions - between 8 to 9 times less computations.
         - Width Multiplier & Resolution Multiplier - less computations.
       - SqueezeNet (SQUEEZENET: ALEXNET-LEVEL ACCURACY WITH 50X FEWER PARAMETERS AND <0.5MB MODEL SIZE, Forrest N. Iandola1, Song Han2, Matthew W. Moskewicz1, Khalid Ashraf1, William J. Dally2, Kurt Keutzer1, ICRL 2017) https://arxiv.org/pdf/1602.07360.pdf
+        - Replace 3x3 filters with 1x1 filters
+        - Decrease the number of input channels to 3x3 filters
+        - Downsample late in the network so that convolution layers have large activation maps
       - etc..
   
   - data pre-processing (Prepare a best spectrogram image for learing)
