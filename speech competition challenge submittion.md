@@ -22,7 +22,7 @@
   - Customize Small Conv Model
     - cnn-trad-fpool3 (paper : http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
       - Hyperparameter tuning
-      - Change model architecture (add layer, change filter size...)
+      - Change model architecture (add layer, change filter size etc.)
     - Apply other SOTA CNN models
       - MobileNet (paper : https://arxiv.org/pdf/1704.04861.pdf)
         - 3x3 depthwise separable convoutions - between 8 to 9 times less computations.
