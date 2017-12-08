@@ -21,7 +21,7 @@
 ## tuning point
 - To make more advanced speech systems..
 
-### customizing the model - by Kim-SungIl, hongym7 (~목요일)
+### customizing the model - by Kim-SungIl, hongym7
 - create custom conv (low_latency_conv, low_latency_svdf)
 - Other parameters to customize
   - tweak the spectrogram creation parameters
@@ -32,7 +32,7 @@
   - --clip_duration_ms
 - Implement other conv (by using recent paper)
 
-### custom training data - by ziippy (~목요일)
+### custom training data - by ziippy
 - you can also supply your own training data
 - <b>you can look at word alignment tools to standardize them (https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/)</b>
 - image augmentation? audio augmentation?
