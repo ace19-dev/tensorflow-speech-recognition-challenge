@@ -20,10 +20,10 @@
 ## 제안하는 알고리즘 (어떤 방향으로 문제를 풀 예정인가요?)
 - We are looking for two workarounds.
   - Customize Small Conv Model
-    - cnn-trad-fpool3 (Paper : Convolutional Neural Networks for Small-footprint Keyword Spotting, Tara N. Sainath, Carolina Parada, 2017) customizing
+    - cnn-trad-fpool3 (Paper : Convolutional Neural Networks for Small-footprint Keyword Spotting, Tara N. Sainath, Carolina Parada, 2017)
       - Hyperparameter tuning
       - Change model architecture
-    - Apply other CNN model
+    - Apply other SOTA CNN models
       - MobileNet (MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications, Andrew G. Howard, Menglong Zhu, Bo Chen, Dmitry Kalenichenko, Weijun Wang, Tobias Weyand, Marco Andreetto, Hartwig Adam, 2017)
         - 3x3 depthwise separable convoutions - between 8 to 9 times less computations.
         - Width Multiplier & Resolution Multiplier - less computations.
