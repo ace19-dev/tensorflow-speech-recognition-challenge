@@ -20,14 +20,14 @@
 ## 제안하는 알고리즘 (어떤 방향으로 문제를 풀 예정인가요?)
 - We are looking for two workarounds.
   - Customize Small Conv Model
-    - cnn-trad-fpool3 http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
+    - cnn-trad-fpool3 (paper : http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
       - Hyperparameter tuning
       - Change model architecture
     - Apply other SOTA CNN models
-      - MobileNet https://arxiv.org/pdf/1704.04861.pdf
+      - MobileNet (paper : https://arxiv.org/pdf/1704.04861.pdf)
         - 3x3 depthwise separable convoutions - between 8 to 9 times less computations.
         - Width Multiplier & Resolution Multiplier - less computations.
-      - SqueezeNet  https://arxiv.org/pdf/1602.07360.pdf
+      - SqueezeNet (paper : https://arxiv.org/pdf/1602.07360.pdf)
         - Replace 3x3 filters with 1x1 filters
         - Decrease the number of input channels to 3x3 filters
         - Downsample late in the network so that convolution layers have large activation maps
