@@ -20,7 +20,7 @@
 ## 제안하는 알고리즘 (어떤 방향으로 문제를 풀 예정인가요?)
 - We are looking for two workarounds.
   - Customize Small Conv Model
-    - cnn-trad-fpool3 (paper : http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
+    - cnn-trad-fpool3 (paper : http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
       - Hyperparameter tuning
       - Change model architecture
     - Apply other SOTA CNN models
