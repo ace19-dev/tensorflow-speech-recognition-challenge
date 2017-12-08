@@ -139,14 +139,15 @@ def main(_):
   # Create the back propagation and training evaluation machinery in the graph.
   with tf.name_scope('cross_entropy'):
     cross_entropy_mean = tf.reduce_mean(
-        tf.nn.softmax_cross_entropy_with_logits(
-            labels=ground_truth_input, logits=logits))
+        tf.nn.softmax_cross_entropy_with_logits(labels=ground_truth_input, logits=logits))
   tf.summary.scalar('cross_entropy', cross_entropy_mean)
+
   with tf.name_scope('train'), tf.control_dependencies(control_dependencies):
     learning_rate_input = tf.placeholder(
         tf.float32, [], name='learning_rate_input')
-    train_step = tf.train.GradientDescentOptimizer(
-        learning_rate_input).minimize(cross_entropy_mean)
+    train_step = tf.train.RMSPropOptimizer(
+        learning_rate_input, 0.9).minimize(cross_entropy_mean)
+
   predicted_indices = tf.argmax(logits, 1)
   expected_indices = tf.argmax(ground_truth_input, 1)
   correct_prediction = tf.equal(predicted_indices, expected_indices)
