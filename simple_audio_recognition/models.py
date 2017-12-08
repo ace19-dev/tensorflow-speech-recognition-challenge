@@ -361,6 +361,8 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   second_bn = BatchNorm(second_conv, is_training, name='bn2')
   second_relu = tf.nn.relu(second_bn)
 
+  print('after second_relu', second_relu)
+
   one_filter_width = 1
   one_filter_height = 1
   third_filter_count = 64
@@ -374,11 +376,10 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   third_conv = tf.nn.conv2d(second_relu, third_weights, [1, 1, 1, 1],
                              'SAME') + third_bias
 
-  print('after third_conv', third_conv)
-
   third_bn = BatchNorm(third_conv, is_training, name='bn3')
   third_relu = tf.nn.relu(third_bn)
 
+  print('after third_relu', third_relu)
 
   fourth_weights = tf.get_variable("fourth_weights",
     shape=[deepwise_filter_height, deepwise_filter_width, 64, 64],
@@ -392,7 +393,7 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   fourth_bn = BatchNorm(fourth_conv, is_training, name='bn4')
   fourth_relu = tf.nn.relu(fourth_bn)
 
-
+  print('after fourth_relu', fourth_relu)
 
   fifth_weights = tf.get_variable("fifth_weights",
     shape=[one_filter_height, one_filter_width, 64, 128],
@@ -408,16 +409,16 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   fifth_relu = tf.nn.relu(fifth_bn)
 
 
+  print('after fifth_relu', fifth_relu)
 
 
-
-  avg_pool = tf.nn.avg_pool(fifth_relu, [1, 5, 5, 1], [1, 1, 1, 1], 'SAME')
+  avg_pool = tf.nn.avg_pool(fifth_relu, [1, 5, 5, 1], [1, 1, 1, 1], 'VALID')
 
   last_conv_shape = avg_pool.get_shape()
   last_conv_output_width = last_conv_shape[2]
   last_conv_output_height = last_conv_shape[1]
 
-  print('after fifth_relu', fifth_relu)
+  print('after avg_pool', avg_pool)
 
   # second_conv_element_count = 42240
   last_conv_element_count = int(
