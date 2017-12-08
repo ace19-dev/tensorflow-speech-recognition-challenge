@@ -356,17 +356,17 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   second_bias = tf.Variable(tf.zeros([deepwise_filter_count]))
 
   second_conv = tf.nn.conv2d(first_relu, second_weights, [1, 1, 1, 1],
-                            'VALID') + second_bias
+                            'SAME') + second_bias
 
   second_bn = BatchNorm(second_conv, is_training, name='bn2')
   second_relu = tf.nn.relu(second_bn)
 
-  third_filter_width = 1
-  third_filter_height = 1
+  one_filter_width = 1
+  one_filter_height = 1
   third_filter_count = 64
 
   third_weights = tf.get_variable("third_weights",
-    shape=[third_filter_height, third_filter_width, deepwise_filter_count, third_filter_count],
+    shape=[one_filter_height, one_filter_width, deepwise_filter_count, third_filter_count],
     initializer=tf.contrib.layers.xavier_initializer())
 
   third_bias = tf.Variable(tf.zeros([third_filter_count]))
@@ -379,34 +379,66 @@ def create_hong_model(fingerprint_input, model_settings, is_training):
   third_bn = BatchNorm(third_conv, is_training, name='bn3')
   third_relu = tf.nn.relu(third_bn)
 
-  max_pool = tf.nn.avg_pool(third_relu, [1, 3, 3, 1], [1, 1, 1, 1], 'SAME')
 
-  third_conv_shape = max_pool.get_shape()
-  third_conv_output_width = third_conv_shape[2] # 20
-  third_conv_output_height = third_conv_shape[1] # 33
+  fourth_weights = tf.get_variable("fourth_weights",
+    shape=[deepwise_filter_height, deepwise_filter_width, 64, 64],
+    initializer=tf.contrib.layers.xavier_initializer())
 
-  print('after third_relu', third_relu)
+  fourth_bias = tf.Variable(tf.zeros([64]))
+
+  fourth_conv = tf.nn.conv2d(third_relu, fourth_weights, [1, 2, 2, 1],
+                             'VALID') + fourth_bias
+
+  fourth_bn = BatchNorm(fourth_conv, is_training, name='bn4')
+  fourth_relu = tf.nn.relu(fourth_bn)
+
+
+
+  fifth_weights = tf.get_variable("fifth_weights",
+    shape=[one_filter_height, one_filter_width, 64, 128],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  fifth_bias = tf.Variable(tf.zeros([128]))
+
+  fifth_conv = tf.nn.conv2d(fourth_relu, fifth_weights, [1, 1, 1, 1],
+                             'SAME') + fifth_bias
+
+
+  fifth_bn = BatchNorm(fifth_conv, is_training, name='bn5')
+  fifth_relu = tf.nn.relu(fifth_bn)
+
+
+
+
+
+  avg_pool = tf.nn.avg_pool(fifth_relu, [1, 5, 5, 1], [1, 1, 1, 1], 'SAME')
+
+  last_conv_shape = avg_pool.get_shape()
+  last_conv_output_width = last_conv_shape[2]
+  last_conv_output_height = last_conv_shape[1]
+
+  print('after fifth_relu', fifth_relu)
 
   # second_conv_element_count = 42240
-  third_conv_element_count = int(
-      third_conv_output_width * third_conv_output_height *
-      third_filter_count)
+  last_conv_element_count = int(
+      last_conv_output_width * last_conv_output_height *
+      128)
 
-  flattened_third_conv = tf.reshape(max_pool,
-                                     [-1, third_conv_element_count])
+  flattened_last_conv = tf.reshape(avg_pool,
+                                     [-1, last_conv_element_count])
 
-  print('after flattened_third_conv', flattened_third_conv)
+  print('after flattened_last_conv', flattened_last_conv)
 
   # label_count = 12 = x + 2
   label_count = model_settings['label_count']
 
   final_fc_weights = tf.get_variable("final_fc_weights",
-    shape=[third_conv_element_count, label_count],
+    shape=[last_conv_element_count, label_count],
     initializer=tf.contrib.layers.xavier_initializer())
 
   final_fc_bias = tf.Variable(tf.zeros([label_count]))
 
-  final_fc = tf.matmul(flattened_third_conv, final_fc_weights) + final_fc_bias
+  final_fc = tf.matmul(flattened_last_conv, final_fc_weights) + final_fc_bias
 
   if is_training:
     return final_fc, dropout_prob
