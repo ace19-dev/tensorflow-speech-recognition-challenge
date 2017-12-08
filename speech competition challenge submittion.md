@@ -20,7 +20,7 @@
 ## 제안하는 알고리즘 (어떤 방향으로 문제를 풀 예정인가요?)
 - We are looking for two workarounds.
   - Customize Small Conv Model
-    - cnn-trad-fpool3 (Paper : Convolutional Neural Networks for Small-footprint Keyword Spotting, Tara N. Sainath, Carolina Parada, 2017)
+    - cnn-trad-fpool3 (Paper : Convolutional Neural Networks for Small-footprint Keyword Spotting, Tara N. Sainath, Carolina Parada, 2017) http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
       - Hyperparameter tuning
       - Change model architecture
     - Apply other SOTA CNN models
