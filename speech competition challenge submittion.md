@@ -25,7 +25,9 @@
       - Change model architecture
     - Apply other CNN model
       - MobileNet (MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications, Andrew G. Howard, Menglong Zhu, Bo Chen, Dmitry Kalenichenko, Weijun Wang, Tobias Weyand, Marco Andreetto, Hartwig Adam, 2017)
-      - SqueezeNet (SQUEEZENET: ALEXNET-LEVEL ACCURACY WITH 50X FEWER PARAMETERS AND <0.5MB MODEL SIZE, Forrest N. Iandola1, Song Han2, Matthew W. Moskewicz1, Khalid Ashraf1, William J. Dally2, Kurt Keutzer1, ICRL 2017)
+        - 3x3 depthwise separable convolutions : get between 8 to 9 times less computations.
+        - 
+      - SqueezeNet (SQUEEZENET: ALEXNET-LEVEL ACCURACY WITH 50X FEWER PARAMETERS AND <0.5MB MODEL SIZE, Forrest N. Iandola1, Song Han2, Matthew W. Moskewicz1, Khalid Ashraf1, William J. Dally2, Kurt Keutzer1, ICRL 2017)
       - etc..
   
   - data pre-processing (Prepare a best spectrogram image for learing)
