@@ -45,7 +45,7 @@
   - Audio time stretching and pitch scaling
 
 ### hyper-parameter tuning
-- number of filter and shape of filter
+- Number of filter and shape of filter
 - Learning Rate
 - Cost Function
 - Regularization parameter
