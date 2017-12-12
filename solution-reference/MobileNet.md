@@ -33,7 +33,7 @@
 - 이 논문의 kep idea 는 <b>Depthwise Separable Convolutions</b> 을 사용하겠다.
   - 성능도 괜찮고 슬림한 네트웍을 만들 수 있다.
 
-## Recap
+## CNN Recap
 - 일반적으로 2D conv. 라고 말하지만, 실제로는 3D operation 이 들어간다. (w, h, c)
 - 예를 들어 3x3 필터를 사용한다고 하면 채널수는 언급되지 않지만, 항상 필터의 채널수는 입력의 채널수와 같다.
 - 아웃풋 채널수는 사용하는 필터의 개수가 된다.
