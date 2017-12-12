@@ -44,12 +44,12 @@
 - Why should we always consider all channels?
 
 ## Depthwise Separable Convolution
-- 기존 conv. 는 채널을 다 고려해서 연산을 하지만, 여기에선 한 채널씩 떼어서 연산.
+- 기존 conv. 는 채널을 전부 고려해서 연산을 하지만, 여기에선 한 채널씩 떼어서 연산.
 - Depthwise Conv. + Pointwise Conv.(1x1 Conv.)
-- 채널방향과 w/h 방향을 분리해서 연산.
-- 만약 3x3 depthwise separable convolutions 사용하면, 8~9 배의 연산량을 줄일 수 있다.
+- 채널 방향과 w/h 방향을 분리해서 연산함.
+- 만약 3x3 depthwise separable convolutions 적용하면 8~9 배의 연산량을 줄일 수 있다.
 
-## Other idea - Width Multiplier / Resolution Multiplier
+## Additional idea - Width Multiplier / Resolution Multiplier
 - Width Multiplier: Conv. 필터(채널)수를 적게 만들고 돌려보겠다 라는 의미
 - Resolution Multiplier: 입력 이미지의 가로/세로를 줄여서 입력하겠다 라는 의미
 
