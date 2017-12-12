@@ -50,7 +50,7 @@
 - 만약 3x3 depthwise separable convolutions 사용하면, 8~9 배의 연산량을 줄일 수 있다.
 
 ## Other idea - Width Multiplier / Resolution Multiplier
-- Width Multiplier: Conv. 필터수(채널)를 적게 만들고 돌려보겠다 라는 의미
+- Width Multiplier: Conv. 필터(채널)수를 적게 만들고 돌려보겠다 라는 의미
 - Resolution Multiplier: 입력 이미지의 가로/세로를 줄여서 입력하겠다 라는 의미
 
 ## implementation
