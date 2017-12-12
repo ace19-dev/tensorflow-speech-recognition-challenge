@@ -36,10 +36,10 @@
 ## CNN Recap
 - 일반적으로 2D conv. 라고 말하지만, 실제로는 3D operation 이 들어간다. (w, h, c)
 - 예를 들어 3x3 필터를 사용한다고 하면 채널수는 언급되지 않지만, 항상 필터의 채널수는 입력의 채널수와 같다.
-- 아웃풋 채널수는 사용하는 필터의 개수가 된다.
+- <b>아웃풋 채널수는 사용하는 필터의 개수가 된다.</b>
 - conv. 는 w, h, c 를 모두 동시에 한꺼번에 고려해서 그것을 다 element-wise 곱을 하고 전체를 sum 을 해서 하나의 숫자로 표현한다.
 - VGG 에서는 3x3 필터만 사용한다. 그전에는 어떤 사이즈의 필터를 사용해야 할지 고민이 많았다.
-- 3x3 필터를 여러번 사용하면 5x5 또는 7x7 conv. layer 와 같은 effective receptive field 를 가진다.
+- 3x3 필터를 여러번 사용하면 5x5 또는 7x7 conv. layer 와 같은 effective receptive field (http://laonple.blog.me/220594258301) 를 가진다.
 - more non-linearities, fewer parameters -> regularization effect
 - Why should we always consider all channels?
 
