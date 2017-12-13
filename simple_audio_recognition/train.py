@@ -111,8 +111,10 @@ def main(_):
         'lists, but are %d and %d long instead' % (len(training_steps_list),
                                                    len(learning_rates_list)))
 
+  #fingerprint_size : 2600
   fingerprint_input = tf.placeholder(
       tf.float32, [None, fingerprint_size], name='fingerprint_input')
+  #shape of fingerprint_input : [2, ]
 
   logits, dropout_prob = models.create_model(
       fingerprint_input,
@@ -124,6 +126,9 @@ def main(_):
   ground_truth_input = tf.placeholder(
       tf.float32, [None, label_count], name='groundtruth_input')
 
+  # shape of ground_truth_input : [2, ]
+  # print(tf.shape(ground_truth_input))
+
   # Optionally we can add runtime checks to spot when NaNs or other symptoms of
   # numerical errors start occurring during training.
   control_dependencies = []
@@ -134,14 +139,15 @@ def main(_):
   # Create the back propagation and training evaluation machinery in the graph.
   with tf.name_scope('cross_entropy'):
     cross_entropy_mean = tf.reduce_mean(
-        tf.nn.softmax_cross_entropy_with_logits(
-            labels=ground_truth_input, logits=logits))
+        tf.nn.softmax_cross_entropy_with_logits(labels=ground_truth_input, logits=logits))
   tf.summary.scalar('cross_entropy', cross_entropy_mean)
+
   with tf.name_scope('train'), tf.control_dependencies(control_dependencies):
     learning_rate_input = tf.placeholder(
         tf.float32, [], name='learning_rate_input')
-    train_step = tf.train.GradientDescentOptimizer(
-        learning_rate_input).minimize(cross_entropy_mean)
+    train_step = tf.train.RMSPropOptimizer(
+        learning_rate_input, 0.9).minimize(cross_entropy_mean)
+
   predicted_indices = tf.argmax(logits, 1)
   expected_indices = tf.argmax(ground_truth_input, 1)
   correct_prediction = tf.equal(predicted_indices, expected_indices)
@@ -291,7 +297,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.1,
+      default=0.2,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
@@ -326,7 +332,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--testing_percentage',
       type=int,
-      default=10,
+      default=15,
       help='What percentage of wavs to use as a test set.')
   parser.add_argument(
       '--validation_percentage',
@@ -351,7 +357,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--window_stride_ms',
       type=float,
-      default=10.0,
+      default=15.0,
       help='How long each spectrogram timeslice is',)
   parser.add_argument(
       '--dct_coefficient_count',
@@ -361,17 +367,17 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='15000,3000',
+      default='8000,5000,3000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
       type=int,
-      default=400,
+      default=1000,
       help='How often to evaluate the training results.')
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.001,0.0001',
+      default='0.01,0.0007,0.0001',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
@@ -396,7 +402,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--save_step_interval',
       type=int,
-      default=100,
+      default=500,
       help='Save model checkpoint every save_steps.')
   parser.add_argument(
       '--start_checkpoint',
@@ -406,7 +412,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='conv',
+      default='mobile',
       help='What model architecture to use')
   parser.add_argument(
       '--check_nans',

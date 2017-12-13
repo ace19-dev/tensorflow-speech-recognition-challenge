@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 """Model definitions for simple speech recognition.
+
 """
 from __future__ import absolute_import
 from __future__ import division
@@ -27,6 +28,7 @@ def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
                            window_size_ms, window_stride_ms,
                            dct_coefficient_count):
   """Calculates common settings needed for all models.
+
   Args:
     label_count: How many classes are to be recognized.
     sample_rate: Number of audio samples per second.
@@ -34,6 +36,7 @@ def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
     window_size_ms: Duration of frequency analysis window.
     window_stride_ms: How far to move in time between frequency windows.
     dct_coefficient_count: Number of frequency bins to use for analysis.
+
   Returns:
     Dictionary containing common settings.
   """
@@ -61,6 +64,7 @@ def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
 def create_model(fingerprint_input, model_settings, model_architecture,
                  is_training, runtime_settings=None):
   """Builds a model of the requested architecture compatible with the settings.
+
   There are many possible ways of deriving predictions from a spectrogram
   input, so this function provides an abstract interface for creating different
   kinds of models in a black-box way. You need to pass in a TensorFlow node as
@@ -68,21 +72,26 @@ def create_model(fingerprint_input, model_settings, model_architecture,
   describe the audio. Typically this will be derived from a spectrogram that's
   been run through an MFCC, but in theory it can be any feature vector of the
   size specified in model_settings['fingerprint_size'].
+
   The function will build the graph it needs in the current TensorFlow graph,
   and return the tensorflow output that will contain the 'logits' input to the
   softmax prediction process. If training flag is on, it will also return a
   placeholder node that can be used to control the dropout amount.
+
   See the implementations below for the possible model architectures that can be
   requested.
+
   Args:
     fingerprint_input: TensorFlow node that will output audio feature vectors.
     model_settings: Dictionary of information about the model.
     model_architecture: String specifying which kind of model to create.
     is_training: Whether the model is going to be used for training.
     runtime_settings: Dictionary of information about the runtime.
+
   Returns:
     TensorFlow node outputting logits results, and optionally a dropout
     placeholder.
+
   Raises:
     Exception: If the architecture type isn't recognized.
   """
@@ -91,6 +100,8 @@ def create_model(fingerprint_input, model_settings, model_architecture,
                                   is_training)
   elif model_architecture == 'conv':
     return create_conv_model(fingerprint_input, model_settings, is_training)
+  elif model_architecture == 'mobile':
+    return create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_training)
   elif model_architecture == 'low_latency_conv':
     return create_low_latency_conv_model(fingerprint_input, model_settings,
                                          is_training)
@@ -105,6 +116,7 @@ def create_model(fingerprint_input, model_settings, model_architecture,
 
 def load_variables_from_checkpoint(sess, start_checkpoint):
   """Utility function to centralize checkpoint restoration.
+
   Args:
     sess: TensorFlow session.
     start_checkpoint: Path to saved checkpoint on disk.
@@ -115,20 +127,25 @@ def load_variables_from_checkpoint(sess, start_checkpoint):
 
 def create_single_fc_model(fingerprint_input, model_settings, is_training):
   """Builds a model with a single hidden fully-connected layer.
+
   This is a very simple model with just one matmul and bias layer. As you'd
   expect, it doesn't produce very accurate results, but it is very fast and
   simple, so it's useful for sanity testing.
+
   Here's the layout of the graph:
+
   (fingerprint_input)
           v
       [MatMul]<-(weights)
           v
       [BiasAdd]<-(bias)
           v
+
   Args:
     fingerprint_input: TensorFlow node that will output audio feature vectors.
     model_settings: Dictionary of information about the model.
     is_training: Whether the model is going to be used for training.
+
   Returns:
     TensorFlow node outputting logits results, and optionally a dropout
     placeholder.
@@ -149,10 +166,13 @@ def create_single_fc_model(fingerprint_input, model_settings, is_training):
 
 def create_conv_model(fingerprint_input, model_settings, is_training):
   """Builds a standard convolutional model.
+
   This is roughly the network labeled as 'cnn-trad-fpool3' in the
   'Convolutional Neural Networks for Small-footprint Keyword Spotting' paper:
   http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
+
   Here's the layout of the graph:
+
   (fingerprint_input)
           v
       [Conv2D]<-(weights)
@@ -175,15 +195,19 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
           v
       [BiasAdd]<-(bias)
           v
+
   This produces fairly good quality results, but can involve a large number of
   weight parameters and computations. For a cheaper alternative from the same
   paper with slightly less accuracy, see 'low_latency_conv' below.
+
   During training, dropout nodes are introduced after each relu, controlled by a
   placeholder.
+
   Args:
     fingerprint_input: TensorFlow node that will output audio feature vectors.
     model_settings: Dictionary of information about the model.
     is_training: Whether the model is going to be used for training.
+
   Returns:
     TensorFlow node outputting logits results, and optionally a dropout
     placeholder.
@@ -194,6 +218,7 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   input_time_size = model_settings['spectrogram_length']
   fingerprint_4d = tf.reshape(fingerprint_input,
                               [-1, input_time_size, input_frequency_size, 1])
+
   first_filter_width = 8
   first_filter_height = 20
   first_filter_count = 64
@@ -204,12 +229,15 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   first_bias = tf.Variable(tf.zeros([first_filter_count]))
   first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 1, 1, 1],
                             'SAME') + first_bias
+  #first_conv = BatchNorm(first_conv, is_training, name='bn1')
   first_relu = tf.nn.relu(first_conv)
+  #first_relu = LeakyReLU(first_conv)
   if is_training:
     first_dropout = tf.nn.dropout(first_relu, dropout_prob)
   else:
     first_dropout = first_relu
   max_pool = tf.nn.max_pool(first_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+
   second_filter_width = 4
   second_filter_height = 10
   second_filter_count = 64
@@ -223,19 +251,28 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   second_bias = tf.Variable(tf.zeros([second_filter_count]))
   second_conv = tf.nn.conv2d(max_pool, second_weights, [1, 1, 1, 1],
                              'SAME') + second_bias
+
+  #second_conv = BatchNorm(second_conv, is_training, name='bn2')
   second_relu = tf.nn.relu(second_conv)
+  #second_relu = LeakyReLU(second_conv)
   if is_training:
     second_dropout = tf.nn.dropout(second_relu, dropout_prob)
   else:
     second_dropout = second_relu
   second_conv_shape = second_dropout.get_shape()
-  second_conv_output_width = second_conv_shape[2]
-  second_conv_output_height = second_conv_shape[1]
+  second_conv_output_width = second_conv_shape[2] # 20
+  second_conv_output_height = second_conv_shape[1] # 33
+
+  # second_conv_element_count = 42240
   second_conv_element_count = int(
       second_conv_output_width * second_conv_output_height *
       second_filter_count)
+
   flattened_second_conv = tf.reshape(second_dropout,
                                      [-1, second_conv_element_count])
+
+
+  # label_count = 12 = x + 2
   label_count = model_settings['label_count']
   final_fc_weights = tf.Variable(
       tf.truncated_normal(
@@ -248,13 +285,179 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
     return final_fc
 
 
+def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_training):
+  """
+        Conv / s2
+
+        BN
+
+        Relu
+
+        Conv dw / s1
+
+        BN
+
+        Relu
+
+        Conv / s1
+
+        BN
+
+        Relu
+
+        Avg Pooling
+
+
+  """
+
+  if is_training:
+    dropout_prob = tf.placeholder(tf.float32, name='dropout_prob')
+  input_frequency_size = model_settings['dct_coefficient_count']
+  input_time_size = model_settings['spectrogram_length']
+  fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size, input_frequency_size, 1])
+
+  print('... ')
+  print('... ')
+  print('after fingerprint_4d', fingerprint_4d)
+
+  # Conv / s2
+
+  first_filter_width = 3
+  first_filter_height = 3
+  first_filter_count = 32
+
+  first_weights = tf.get_variable("first_weights",
+    shape=[first_filter_height, first_filter_width, 1, first_filter_count],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  print('after first_weights', first_weights)
+
+  first_bias = tf.Variable(tf.zeros([first_filter_count]))
+  first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 2, 2, 1],
+                            'VALID') + first_bias
+
+  first_bn = BatchNorm(first_conv, is_training, name='bn1')
+  first_relu = tf.nn.relu(first_bn)
+
+  print('after first_relu', first_relu)
+
+
+  # Conv dw / s1
+
+  deepwise_filter_width = 3
+  deepwise_filter_height = 3
+  deepwise_filter_channel = 32
+  deepwise_filter_count = 32
+
+  second_weights = tf.get_variable("second_weights",
+    shape=[deepwise_filter_height, deepwise_filter_width, deepwise_filter_channel, deepwise_filter_count],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  second_bias = tf.Variable(tf.zeros([deepwise_filter_count]))
+
+  second_conv = tf.nn.conv2d(first_relu, second_weights, [1, 1, 1, 1],
+                            'SAME') + second_bias
+
+  second_bn = BatchNorm(second_conv, is_training, name='bn2')
+  second_relu = tf.nn.relu(second_bn)
+
+  print('after second_relu', second_relu)
+
+  one_filter_width = 1
+  one_filter_height = 1
+  third_filter_count = 64
+
+  third_weights = tf.get_variable("third_weights",
+    shape=[one_filter_height, one_filter_width, deepwise_filter_count, third_filter_count],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  third_bias = tf.Variable(tf.zeros([third_filter_count]))
+
+  third_conv = tf.nn.conv2d(second_relu, third_weights, [1, 1, 1, 1],
+                             'SAME') + third_bias
+
+  third_bn = BatchNorm(third_conv, is_training, name='bn3')
+  third_relu = tf.nn.relu(third_bn)
+
+  print('after third_relu', third_relu)
+
+  fourth_weights = tf.get_variable("fourth_weights",
+    shape=[deepwise_filter_height, deepwise_filter_width, 64, 64],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  fourth_bias = tf.Variable(tf.zeros([64]))
+
+  fourth_conv = tf.nn.conv2d(third_relu, fourth_weights, [1, 2, 2, 1],
+                             'VALID') + fourth_bias
+
+  fourth_bn = BatchNorm(fourth_conv, is_training, name='bn4')
+  fourth_relu = tf.nn.relu(fourth_bn)
+
+  print('after fourth_relu', fourth_relu)
+
+  fifth_weights = tf.get_variable("fifth_weights",
+    shape=[one_filter_height, one_filter_width, 64, 128],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  fifth_bias = tf.Variable(tf.zeros([128]))
+
+  fifth_conv = tf.nn.conv2d(fourth_relu, fifth_weights, [1, 1, 1, 1],
+                             'SAME') + fifth_bias
+
+
+  fifth_bn = BatchNorm(fifth_conv, is_training, name='bn5')
+  fifth_relu = tf.nn.relu(fifth_bn)
+
+
+  print('after fifth_relu', fifth_relu)
+
+
+  avg_pool = tf.nn.avg_pool(fifth_relu, [1, 5, 5, 1], [1, 1, 1, 1], 'VALID')
+
+  last_conv_shape = avg_pool.get_shape()
+  last_conv_output_width = last_conv_shape[2]
+  last_conv_output_height = last_conv_shape[1]
+
+  print('after avg_pool', avg_pool)
+
+  # second_conv_element_count = 42240
+  last_conv_element_count = int(
+      last_conv_output_width * last_conv_output_height *
+      128)
+
+  flattened_last_conv = tf.reshape(avg_pool,
+                                     [-1, last_conv_element_count])
+
+  print('after flattened_last_conv', flattened_last_conv)
+
+  # label_count = 12 = x + 2
+  label_count = model_settings['label_count']
+
+  final_fc_weights = tf.get_variable("final_fc_weights",
+    shape=[last_conv_element_count, label_count],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  final_fc_bias = tf.Variable(tf.zeros([label_count]))
+
+  final_fc = tf.matmul(flattened_last_conv, final_fc_weights) + final_fc_bias
+
+  if is_training:
+    return final_fc, dropout_prob
+  else:
+    return final_fc
+
+
+
 def create_low_latency_conv_model(fingerprint_input, model_settings,
                                   is_training):
   """Builds a convolutional model with low compute requirements.
+
   This is roughly the network labeled as 'cnn-one-fstride4' in the
   'Convolutional Neural Networks for Small-footprint Keyword Spotting' paper:
   http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
+
   Here's the layout of the graph:
+
   (fingerprint_input)
           v
       [Conv2D]<-(weights)
@@ -275,14 +478,18 @@ def create_low_latency_conv_model(fingerprint_input, model_settings,
           v
       [BiasAdd]<-(bias)
           v
+
   This produces slightly lower quality results than the 'conv' model, but needs
   fewer weight parameters and computations.
+
   During training, dropout nodes are introduced after the relu, controlled by a
   placeholder.
+
   Args:
     fingerprint_input: TensorFlow node that will output audio feature vectors.
     model_settings: Dictionary of information about the model.
     is_training: Whether the model is going to be used for training.
+
   Returns:
     TensorFlow node outputting logits results, and optionally a dropout
     placeholder.
@@ -356,10 +563,13 @@ def create_low_latency_conv_model(fingerprint_input, model_settings,
 def create_low_latency_svdf_model(fingerprint_input, model_settings,
                                   is_training, runtime_settings):
   """Builds an SVDF model with low compute requirements.
+
   This is based in the topology presented in the 'Compressing Deep Neural
   Networks using a Rank-Constrained Topology' paper:
   https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43813.pdf
+
   Here's the layout of the graph:
+
   (fingerprint_input)
           v
         [SVDF]<-(weights)
@@ -380,10 +590,13 @@ def create_low_latency_svdf_model(fingerprint_input, model_settings,
           v
       [BiasAdd]<-(bias)
           v
+
   This model produces lower recognition accuracy than the 'conv' model above,
   but requires fewer weight parameters and, significantly fewer computations.
+
   During training, dropout nodes are introduced after the relu, controlled by a
   placeholder.
+
   Args:
     fingerprint_input: TensorFlow node that will output audio feature vectors.
     The node is expected to produce a 2D Tensor of shape:
@@ -394,9 +607,11 @@ def create_low_latency_svdf_model(fingerprint_input, model_settings,
     model_settings: Dictionary of information about the model.
     is_training: Whether the model is going to be used for training.
     runtime_settings: Dictionary of information about the runtime.
+
   Returns:
     TensorFlow node outputting logits results, and optionally a dropout
     placeholder.
+
   Raises:
       ValueError: If the inputs tensor is incorrectly shaped.
   """
@@ -527,3 +742,38 @@ def create_low_latency_svdf_model(fingerprint_input, model_settings,
     return final_fc, dropout_prob
   else:
     return final_fc
+
+
+## Regularizations
+def BatchNorm(input, is_train, decay=0.999, name='BatchNorm'):
+  '''
+  https://github.com/zsdonghao/tensorlayer/blob/master/tensorlayer/layers.py
+  https://github.com/ry/tensorflow-resnet/blob/master/resnet.py
+  http://stackoverflow.com/questions/38312668/how-does-one-do-inference-with-batch-normalization-with-tensor-flow
+  '''
+  from tensorflow.python.training import moving_averages
+  from tensorflow.python.ops import control_flow_ops
+
+  axis = list(range(len(input.get_shape()) - 1))
+  fdim = input.get_shape()[-1:]
+
+  with tf.variable_scope(name):
+    beta = tf.get_variable('beta', fdim, initializer=tf.constant_initializer(value=0.0))
+    gamma = tf.get_variable('gamma', fdim, initializer=tf.constant_initializer(value=1.0))
+    moving_mean = tf.get_variable('moving_mean', fdim, initializer=tf.constant_initializer(value=0.0), trainable=False)
+    moving_variance = tf.get_variable('moving_variance', fdim, initializer=tf.constant_initializer(value=0.0), trainable=False)
+
+    def mean_var_with_update():
+      batch_mean, batch_variance = tf.nn.moments(input, axis)
+      update_moving_mean = moving_averages.assign_moving_average(moving_mean, batch_mean, decay, zero_debias=True)
+      update_moving_variance = moving_averages.assign_moving_average(moving_variance, batch_variance, decay, zero_debias=True)
+      with tf.control_dependencies([update_moving_mean, update_moving_variance]):
+        return tf.identity(batch_mean), tf.identity(batch_variance)
+
+    mean, variance = control_flow_ops.cond(tf.cast(is_train, tf.bool), mean_var_with_update, lambda: (moving_mean, moving_variance))
+
+  return tf.nn.batch_normalization(input, mean, variance, beta, gamma, 1e-3)
+
+
+def LeakyReLU(input, alpha=0.2):
+  return tf.maximum(input, alpha*input)
