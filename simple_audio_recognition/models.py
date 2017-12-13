@@ -100,8 +100,8 @@ def create_model(fingerprint_input, model_settings, model_architecture,
                                   is_training)
   elif model_architecture == 'conv':
     return create_conv_model(fingerprint_input, model_settings, is_training)
-  elif model_architecture == 'hong':
-    return create_hong_model(fingerprint_input, model_settings, is_training)
+  elif model_architecture == 'mobile':
+    return create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_training)
   elif model_architecture == 'low_latency_conv':
     return create_low_latency_conv_model(fingerprint_input, model_settings,
                                          is_training)
@@ -285,7 +285,7 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
     return final_fc
 
 
-def create_hong_model(fingerprint_input, model_settings, is_training):
+def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_training):
   """
         Conv / s2
 
