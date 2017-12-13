@@ -31,12 +31,12 @@
 - Also review the Prizes tab for details and tools for how the special prize will be evaluated. (https://www.kaggle.com/c/tensorflow-speech-recognition-challenge#Prizes)
 
 ## Question
-- 어떤 방법으로 음성 데이터를 분류할 수 있을까??
-- <b>대표적인 네트웍인 CNN 을 사용한다면, 어떻게 음성 데이터를 전처리할 수 있을까?? (main idea: Wave -> spectrogram)</b>
-- 시간축이 포함된 데이터 인데 RNN 네트웍을 사용하는것이 더 좋은 방법이 아닐까??
-- 또 다른 방법은 어떤것이 있을까? (WaveNet)
-- 학습데이터를 손실없이 효과적으로 줄일 수 있는 방법은?
-- 실 생활 데이터에서 음성만 추출할 수 있는 방법은?
+- How can we classify voice data?
+- <b> If you use CNN, a typical network, how can you preprocess voice data? (main idea: Wave -> spectrogram) </ b>
+- Is it better to use the RNN network because it contains data with time axis?
+- What else is there? (WaveNet)
+- How can we effectively reduce learning data without loss?
+- How can I extract voice only from real life data?
 
 
 ## Solutions
