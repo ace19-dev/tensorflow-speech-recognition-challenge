@@ -32,7 +32,7 @@
 
 ## Question
 - How can we classify voice data?
-- <b> If you use CNN, a typical network, how can you preprocess voice data? (main idea: Wave -> spectrogram) </ b>
+- <b> If you use CNN, a typical network, how can you preprocess voice data? (main idea: Wave -> spectrogram) </b>
 - Is it better to use the RNN network because it contains data with time axis?
 - What else is there? (WaveNet)
 - How can we effectively reduce learning data without loss?
