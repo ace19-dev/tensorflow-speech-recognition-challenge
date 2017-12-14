@@ -5,12 +5,12 @@ M2	93.8%	8000/5000/3000	0.01/0.002/0.0001	100	RMSPropOptimizer	Relu
 										
 	
 	
-| Model        | 결과           | Traning Step  |
-| ------------- |-------------  | -----         |
-| col 3 is      | right-aligned | $1600         |
-| col 2 is      | centered      |   $12         |
-| zebra stripes | are neat      |    $1         |
-| zebra stripes | are neat      |    $1         |
+| Model            | 결과         | Traning Step |
+| -------------    |------------- | -----        |
+| M1     | 86.5%   | $1600        |
+| M2     | 89.2%   |   $12        |
+| M2     | 93.8%   |    $1        |
+
 	
 										
 										
