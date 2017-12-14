@@ -3,7 +3,15 @@ M1	86.5%	15000/3000	0.01/0.001/0.0001	100	GradientDescentOptimizer	Relu	10	10	10
 M2	89.2%	15000/3000	0.01/0.001/0.0001	100	GradientDescentOptimizer	Relu				
 M2	93.8%	8000/5000/3000	0.01/0.002/0.0001	100	RMSPropOptimizer	Relu				
 										
-										
+	
+	
+| Model        | 결과           | Traning Step  |
+| ------------- |-------------  | -----         |
+| col 3 is      | right-aligned | $1600         |
+| col 2 is      | centered      |   $12         |
+| zebra stripes | are neat      |    $1         |
+| zebra stripes | are neat      |    $1         |
+	
 										
 										
 M1	"Conv / s2
@@ -35,9 +43,3 @@ Avg Pool / s1"	"3 x 3 x 1 x 32
 "							
  
  
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-| zebra stripes | are neat      |    $1 |
