@@ -5,9 +5,8 @@ M2	93.8%	8000/5000/3000	0.01/0.002/0.0001	100	RMSPropOptimizer	Relu
 										
 	
 	
-| Model         | 결과         | Traning Step   | Learning Rate     |  batch_size  |  optimizer               | activation fn. | silence_percentage    |    unknown_percentage   |  time_shift_ms  | sample_rate    | 
+| Model         | 결과         | Traning Step   | Learning Rate     |  batch_size  |  optimizer               | activation fn. | 
 | ------------- |------------- | -----          | -----------       | -----------  | ----------               | -------------- |
-----------------      |    ------------------   |  ---------------| -------------    |
 | M1            | 86.5%        | 15000/3000     | 0.01/0.001/0.0001 | 100          | GradientDescentOptimizer | Relu           |
 | M2            | 89.2%        | 15000/3000     | 0.01/0.001/0.0001 | 100          | GradientDescentOptimizer | Relu           |
 | M2            | 93.8%        | 8000/5000/3000 | 0.01/0.002/0.0001 | 100          | RMSPropOptimizer         | Relu           |
