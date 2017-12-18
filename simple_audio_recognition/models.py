@@ -108,6 +108,8 @@ def create_model(fingerprint_input, model_settings, model_architecture,
   elif model_architecture == 'low_latency_svdf':
     return create_low_latency_svdf_model(fingerprint_input, model_settings,
                                          is_training, runtime_settings)
+  elif model_architecture == 'squeeze':
+    return create_low_latency_squeeze_model(fingerprint_input, model_settings, is_training)
   else:
     raise Exception('model_architecture argument "' + model_architecture +
                     '" not recognized, should be one of "single_fc", "conv",' +
@@ -743,6 +745,103 @@ def create_low_latency_svdf_model(fingerprint_input, model_settings,
   else:
     return final_fc
 
+
+def create_low_latency_squeeze_model(fingerprint_input, model_settings, is_training):
+    squeeze_ratio = 1
+    if is_training:
+        dropout_prob = tf.placeholder(tf.float32, name='dropout_prob')
+    input_frequency_size = model_settings['dct_coefficient_count']
+    input_time_size = model_settings['spectrogram_length']
+    fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size, input_frequency_size, 1])
+    print('fingerprint_4d : ', fingerprint_4d)
+    first_filter_width = 2
+    first_filter_height = 2
+    first_filter_count = 64
+    first_weights = tf.get_variable("first_weight", shape=[first_filter_height, first_filter_width, 1, first_filter_count],
+                                    initializer=tf.contrib.layers.xavier_initializer())
+
+    # conv1_1
+    first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 2, 2, 1], 'SAME')
+    print('first_conv : ', first_conv)
+    relu1 = tf.nn.relu(first_conv + bias_variable([64]))
+    pool1 = tf.nn.max_pool(relu1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
+    print('pool1 : ', pool1)
+    fire2 = fire_module('fire2', pool1, squeeze_ratio * 16, 64, 64)
+    print('fire2 : ', fire2)
+    fire3 = fire_module('fire3', fire2, squeeze_ratio * 16, 64, 64, True)
+    print('fire3 : ', fire3)
+    pool3 = tf.nn.max_pool(fire3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
+    print('pool3 : ', pool3)
+    fire4 = fire_module('fire4', pool3, squeeze_ratio * 32, 128, 128)
+    print('fire4 : ', fire4)
+    fire5 = fire_module('fire5', fire4, squeeze_ratio * 32, 128, 128, True)
+    print('fire5 : ', fire5)
+    #pool5 = tf.nn.max_pool(fire5, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='VALID')
+
+    #fire6 = fire_module('fire6', pool5, squeeze_ratio * 48, 192, 192)
+
+    #fire7 = fire_module('fire7', fire6, squeeze_ratio * 48, 192, 192, True)
+
+    #fire8 = fire_module('fire8', fire7, squeeze_ratio * 64, 256, 256)
+
+    #fire9 = fire_module('fire9', fire8, squeeze_ratio * 64, 256, 256, True)
+
+    # 50% dropout
+    dropout9 = tf.nn.dropout(fire5, dropout_prob)
+    print('dropout9 : ', dropout9)
+    second_weights = tf.Variable(tf.random_normal([1, 1, 256, 1000], stddev=0.01), name="second_weight")
+    second_conv = tf.nn.conv2d(dropout9, second_weights, [1, 2, 2, 1], 'SAME')
+    print('second_conv : ', second_conv)
+    relu10 = tf.nn.relu(second_conv + bias_variable([1000]))
+    print('relu10 : ', relu10)
+    # avg pool
+    pool10 = tf.nn.avg_pool(relu10, ksize=[1, 3, 3, 1], strides=[1, 1, 1, 1], padding='VALID')
+    print('pool10 : ', pool10)
+    last_conv_shape = pool10.get_shape()
+    last_conv_ouput_width = last_conv_shape[2]
+    last_conv_ouput_height = last_conv_shape[1]
+    last_conv_element_count = int(last_conv_ouput_width * last_conv_ouput_height * 1000)
+    flattend_last_conv = tf.reshape(pool10, [-1, last_conv_element_count])
+    label_count = model_settings['label_count']
+    print('last_conv_element_count', last_conv_element_count)
+    print('flattend_last_conv', flattend_last_conv)
+    print('label_count', label_count)
+    final_fc_weights = tf.get_variable("final_fc_weights", shape=[last_conv_element_count, label_count], initializer=tf.contrib.layers.xavier_initializer())
+    final_fc_bias = tf.Variable(tf.zeros([label_count]))
+    final_fc = tf.matmul(flattend_last_conv, final_fc_weights) + final_fc_bias
+
+    if is_training:
+        return final_fc, dropout_prob
+    else:
+        return final_fc
+
+def bias_variable(shape, value=0.1):
+    return tf.Variable(tf.constant(value, shape=shape))
+
+
+def fire_module(layer_name, layer_input, s1x1, e1x1, e3x3, residual=False):
+    """ Fire module consists of squeeze and expand convolutional layers. """
+    fire = {}
+    shape = layer_input.get_shape()
+    # squeeze
+    s1_weight = tf.get_variable(layer_name + '_s1', shape=[1, 1, int(shape[3]), s1x1], initializer=tf.contrib.layers.xavier_initializer())
+    # expand
+    e1_weight = tf.get_variable(layer_name + '_e1', shape=[1, 1, s1x1, e1x1], initializer=tf.contrib.layers.xavier_initializer())
+    e3_weight = tf.get_variable(layer_name + '_e3', shape=[3, 3, s1x1, e3x3], initializer=tf.contrib.layers.xavier_initializer())
+
+    fire['s1'] = tf.nn.conv2d(layer_input, s1_weight, strides=[1, 1, 1, 1], padding='SAME')
+    fire['relu1'] = tf.nn.relu(fire['s1'] + bias_variable([s1x1]))
+
+    fire['e1'] = tf.nn.conv2d(fire['relu1'], e1_weight, strides=[1, 1, 1, 1], padding='SAME')
+    fire['e3'] = tf.nn.conv2d(fire['relu1'], e3_weight, strides=[1, 1, 1, 1], padding='SAME')
+
+    fire['concat'] = tf.concat([tf.add(fire['e1'], bias_variable([e1x1])),
+                                tf.add(fire['e3'], bias_variable([e3x3]))], 3)
+    if residual:
+        fire['relu2'] = tf.nn.relu(tf.add(fire['concat'], layer_input))
+    else:
+        fire['relu2'] = tf.nn.relu(fire['concat'])
+    return fire['relu2']
 
 ## Regularizations
 def BatchNorm(input, is_train, decay=0.999, name='BatchNorm'):
