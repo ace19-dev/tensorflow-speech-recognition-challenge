@@ -11,3 +11,7 @@
 | M2              | Conv / s2Conv dw / s1Conv / s1Conv dw / s2Conv / s1Avg Pool / s1 | 3 x 3 x 1 x 32 3 x 3 x 32 x 321 x 1 x 32 x 643 x 3 x 64 x 641 x 1 x 64 x 128 | 65 x 40 x 132 x 19 x 3232 x 19 x 3232 x 19 x 6415 x 9 x 6415 x 9 x 12815 x 9 x 128 | 260019456194563891286401728017280 | 123624                   |                     |                    |                    |               |             |
 |                 |                                                                  |                                                                              |                                                                                    |                                   |                          |                     |                    |                    |               |             |
 | cnn-trad-fpool3 | Conv2dMaxPoolConv2d                                              |                                                                              | 65 x 40 x 6433 x 20 x 6433 x 20 x 64                                               | 1664004224042240                  | 250880                   |                     |                    |                    |               |             |
+
+
+
+![alt text](https://i.imgur.com/eqadZIy.png)
