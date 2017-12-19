@@ -1,3 +1,4 @@
+
 - We are looking for two workarounds.
   - Customize Small Conv Model
     - cnn-trad-fpool3 (paper : http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
