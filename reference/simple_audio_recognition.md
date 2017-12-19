@@ -19,3 +19,11 @@
 ## # spectrogram
 - A spectrogram is a visual representation of the spectrum of frequencies of sound or other signal as they vary with time or some other variable
 - Spectrograms can be used to identify spoken words phonetically, and to analyse the various calls of animals. They are used extensively in the development of the fields of music, sonar, radar, and speech processing,[1] seismology, and others.
+
+
+## reference
+- http://www.kiranjose.in/blogs/getting-started-with-tensorflow-speech-recognition-api-and-object-detection-api/
+- http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
+- Computation and Language
+  - Towards End-to-End Speech Recognition with Deep Convolutional Neural Network (https://arxiv.org/abs/1701.02720)
+  - The Microsoft 2016 Conversational Speech Recognition System (https://arxiv.org/abs/1609.03528)
