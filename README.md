@@ -68,6 +68,6 @@
 
 
 ## Additional work - After reaching a satisfactory level, we would try other resolutions
-- see reference.
+- see [reference].(https://github.com/ace19-dev/tensorflow-speech-recognition-challenge/tree/master/reference)
 
 
