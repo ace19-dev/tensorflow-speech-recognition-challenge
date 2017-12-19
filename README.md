@@ -40,7 +40,8 @@
 - How can I extract voice only from real life data?
 
 
-## Solutions - first, we customize this (https://www.tensorflow.org/versions/master/tutorials/audio_recognition)
+## Solutions 
+### first, we customize this (https://www.tensorflow.org/versions/master/tutorials/audio_recognition)
 - Customize Small ConvNet Model
   - cnn-trad-fpool3 (paper : http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
     - Hyperparameter tuning
@@ -63,7 +64,8 @@
  
 
 
-## Additional work - After reaching a satisfactory level, we would try other resolutions
+## Additional work 
+### After reaching a satisfactory level, we would try other resolutions
 - see [reference](https://github.com/ace19-dev/tensorflow-speech-recognition-challenge/tree/master/reference)
 
 
