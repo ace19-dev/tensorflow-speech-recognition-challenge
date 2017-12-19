@@ -67,19 +67,7 @@
     - Number of frequency bins to use for analysis
 
 
-## Additional work - After reaching a satisfactory level, we would try other resolutions like below
-- http://www.kiranjose.in/blogs/getting-started-with-tensorflow-speech-recognition-api-and-object-detection-api/
-- http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
-- https://svds.com/tensorflow-rnn-tutorial/
-  - https://github.com/silicon-valley-data-science/RNN-Tutorial
-  - Several key improvements that have been made by the Microsoft team and other researchers in the past 4 years include:
-    - using language models on top of character based RNNs
-    - using convolutional neural nets (CNNs) for extracting features from the audio
-    - ensemble models that utilize multiple RNNs
-- Computation and Language
-  - Towards End-to-End Speech Recognition with Deep Convolutional Neural Network (https://arxiv.org/abs/1701.02720)
-  - The Microsoft 2016 Conversational Speech Recognition System (https://arxiv.org/abs/1609.03528)
-- https://deepmind.com/blog/wavenet-generative-model-raw-audio/
-  - Pixel RNN (https://arxiv.org/abs/1601.06759)
-  - Pixel CNN (https://arxiv.org/abs/1606.05328)
+## Additional work - After reaching a satisfactory level, we would try other resolutions
+- see reference.
+
 
