@@ -42,7 +42,7 @@
 
 ## Solutions 
 ### first, we customize this (https://www.tensorflow.org/versions/master/tutorials/audio_recognition)
-- Customize Small ConvNet Model
+- Customize Small ConvNet Models
   - cnn-trad-fpool3 (paper : http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
     - Hyperparameter tuning
     - Change model architecture (add layer, change filter size etc.)
