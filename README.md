@@ -82,4 +82,4 @@
 - https://deepmind.com/blog/wavenet-generative-model-raw-audio/
   - Pixel RNN (https://arxiv.org/abs/1601.06759)
   - Pixel CNN (https://arxiv.org/abs/1606.05328)
-  
+
