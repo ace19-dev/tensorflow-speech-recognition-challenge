@@ -19,7 +19,7 @@
 
 
 ## tuning point
-- To make more advanced speech systems..
+- To make more advanced speech systems,
 
 ### customizing the model
 - create custom convnet (low_latency_conv, low_latency_svdf)
