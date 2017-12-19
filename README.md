@@ -30,6 +30,7 @@
 - Link to purchase Raspberry Pi 3 on Amazon. This will be at your own expense.
 - Also review the Prizes tab for details and tools for how the special prize will be evaluated. (https://www.kaggle.com/c/tensorflow-speech-recognition-challenge#Prizes)
 
+
 ## Question
 - How can we classify voice data?
 - <b> If you use CNN, a typical network, how can you preprocess voice data? (main idea: Wave -> spectrogram) </b>
@@ -39,22 +40,45 @@
 - How can I extract voice only from real life data?
 
 
-## Solutions
+## Solutions - first, we customize this challenge like below
+- Customize Small ConvNet Model
+- cnn-trad-fpool3 (paper : http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
+  - Hyperparameter tuning
+  - Change model architecture (add layer, change filter size etc.)
+- Apply other SOTA CNN models
+  - MobileNet (paper : https://arxiv.org/pdf/1704.04861.pdf)
+    - 3x3 depthwise separable convolutions - between 8 to 9 times less computations.
+    - Width Multiplier & Resolution Multiplier - less computations.
+  - SqueezeNet (paper : https://arxiv.org/pdf/1602.07360.pdf)
+    - Replace 3x3 filters with 1x1 filters
+    - Decrease the number of input channels to 3x3 filters
+    - Downsample late in the network so that convolution layers have large activation maps
+  - etc..
+- Data pre-processing (Prepare a best spectrogram image for learning)
+- wav volume normalization
+- find the section of the word based on volume dB level efficiently
+- create the spectrogram png using by wav_to_spectrogram
+- each spectrogram png size change to same size
+- Augmentation
+  - pitch shift
+  - time expanding
+  - time_shift
+  - How loud the background noise
+  - Number of frequency bins to use for analysis
+
+
+## Additional work - After reaching a satisfactory level, we would try other resolutions like below
 - http://www.kiranjose.in/blogs/getting-started-with-tensorflow-speech-recognition-api-and-object-detection-api/
 - http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
 - https://svds.com/tensorflow-rnn-tutorial/
-	- github: https://github.com/silicon-valley-data-science/RNN-Tutorial
-	- Several key improvements that have been made by the Microsoft team and other researchers in the past 4 years include:
-		- using language models on top of character based RNNs
-		- using convolutional neural nets (CNNs) for extracting features from the audio
-		- ensemble models that utilize multiple RNNs
-	- Computation and Language
-		- Towards End-to-End Speech Recognition with Deep Convolutional Neural Network
-			- https://arxiv.org/abs/1701.02720
-		- The Microsoft 2016 Conversational Speech Recognition System
-			- https://arxiv.org/abs/1609.03528
+  - https://github.com/silicon-valley-data-science/RNN-Tutorial
+  - Several key improvements that have been made by the Microsoft team and other researchers in the past 4 years include:
+    - using language models on top of character based RNNs
+    - using convolutional neural nets (CNNs) for extracting features from the audio
+    - ensemble models that utilize multiple RNNs
+- Computation and Language
+  - Towards End-to-End Speech Recognition with Deep Convolutional Neural Network (https://arxiv.org/abs/1701.02720)
+  - The Microsoft 2016 Conversational Speech Recognition System (https://arxiv.org/abs/1609.03528)
 - https://deepmind.com/blog/wavenet-generative-model-raw-audio/
-	- Pixel RNN
-		- https://arxiv.org/abs/1601.06759
-	- Pixel CNN
-		- https://arxiv.org/abs/1606.05328
+  - Pixel RNN (https://arxiv.org/abs/1601.06759)
+  - Pixel CNN (https://arxiv.org/abs/1606.05328)
