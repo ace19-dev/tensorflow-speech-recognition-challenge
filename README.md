@@ -67,7 +67,7 @@
     - Number of frequency bins to use for analysis
 
 
-## Additional work - After reaching a satisfactory level, we would try other resolutions
+## Additional work - After reaching a satisfactory level, we would try other resolutions like below
 - http://www.kiranjose.in/blogs/getting-started-with-tensorflow-speech-recognition-api-and-object-detection-api/
 - http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
 - https://svds.com/tensorflow-rnn-tutorial/
