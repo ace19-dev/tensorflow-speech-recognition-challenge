@@ -19,4 +19,7 @@
 | cnn-trad-fpool3 | Conv2d MaxPool Conv2d                                                 |                                                                                  | 65 x 40 x 64 33 x 20 x 64 33 x 20 x 64                                                   | 250880       |
 
 
+</br>
+</br>
+
 ![alt text](https://i.imgur.com/eqadZIy.png)
