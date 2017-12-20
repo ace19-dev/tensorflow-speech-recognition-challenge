@@ -7,7 +7,8 @@
 |                 |                                                                  |                                                                              |                                                                                    |                                   |                          |                     |                    |                    |               |             |
 |                 |                                                                  |                                                                              |                                                                                    |                                   |                          |                     |                    |                    |               |             |
 
-
+</br>
+</br>
 
 
 | Network Name    | Architecture                                                          | Filter Size                                                                      | Feature Size                                                                             | Memory Usage |
