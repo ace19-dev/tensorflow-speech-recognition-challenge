@@ -6,6 +6,7 @@
 |                 |                                                                       |                                                                                  |                                                                                          |              |
 | cnn-trad-fpool3 | Conv2d </br> MaxPool </br> Conv2d                                                 |                                                                                  | 65 x 40 x 64 </br> 33 x 20 x 64 </br> 33 x 20 x 64                                                   | 250.9K       |
 
+
 ### Results
 | Model | Accuracy | Traning Step   | Learning Rate       | Batch Size | Optimizer                | Activation function | silence_percentage | unknown_percentage | time_shift_ms | sample_rate |
 |-------|----------|----------------|---------------------|------------|--------------------------|---------------------|--------------------|--------------------|---------------|-------------|
@@ -15,6 +16,7 @@
 | M2    | 94.2%    | 7000/5000/4000 | 0.008/0.0005/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
 | M2    | 94.8%    | 7000/5000/4000 | 0.007/0.0004/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
 | M3    | 95.6%    | 4000/5000/7000 | 0.005/0.0002/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
+
 
 ### Tensorboard
 ![alt text](https://i.imgur.com/eqadZIy.png)
