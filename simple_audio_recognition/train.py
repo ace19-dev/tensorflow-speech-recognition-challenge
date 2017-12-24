@@ -182,8 +182,7 @@ def main(_):
 
   # Save list of words.
   with gfile.GFile(
-      os.path.join(FLAGS.train_dir, FLAGS.model_architecture + '_labels.txt'),
-      'w') as f:
+      os.path.join(FLAGS.train_dir, FLAGS.model_architecture + '_labels.txt'),'w') as f:
     f.write('\n'.join(audio_processor.words_list))
 
   # Training loop.
@@ -216,6 +215,7 @@ def main(_):
     tf.logging.info('Step #%d: rate %f, accuracy %.1f%%, cross entropy %f' %
                     (training_step, learning_rate_value, train_accuracy * 100,
                      cross_entropy_value))
+
     is_last_step = (training_step == training_steps_max)
     if (training_step % FLAGS.eval_step_interval) == 0 or is_last_step:
       set_size = audio_processor.set_size('validation')
@@ -290,7 +290,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='../../tmp/speech_commands/speech_dataset/',
+      default='../../../dl_data/speech_commands/speech_dataset/',
       help="""\
       Where to download the speech training data to.
       """)
@@ -358,7 +358,7 @@ if __name__ == '__main__':
       '--window_stride_ms',
       type=float,
       default=15.0,
-      help='How long each spectrogram timeslice is',)
+      help='How far to move in time between frequency windows',)
   parser.add_argument(
       '--dct_coefficient_count',
       type=int,
@@ -367,7 +367,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='15000',
+      default='8000,5000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -377,7 +377,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.001',
+      default='0.001,0.0005',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
@@ -387,7 +387,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--summaries_dir',
       type=str,
-      default='../../tmp/speech_commands/retrain_logs',
+      default='../../../dl_data/speech_commands/retrain_logs',
       help='Where to save summary logs for TensorBoard.')
   parser.add_argument(
       '--wanted_words',
@@ -397,7 +397,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--train_dir',
       type=str,
-      default='../../tmp/speech_commands/speech_commands_train',
+      default='../../../dl_data/speech_commands/speech_commands_train',
       help='Directory to write event logs and checkpoint.')
   parser.add_argument(
       '--save_step_interval',
@@ -412,7 +412,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='squeeze',
+      default='mobile',
       help='What model architecture to use')
   parser.add_argument(
       '--check_nans',

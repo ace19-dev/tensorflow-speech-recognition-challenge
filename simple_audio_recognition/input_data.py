@@ -198,8 +198,7 @@ class AudioProcessor(object):
     The training loop needs a list of all the available data, organized by
     which partition it should belong to, and with ground truth labels attached.
     This function analyzes the folders below the `data_dir`, figures out the
-    right
-    labels for each file based on the name of the subdirectory it belongs to,
+    right labels for each file based on the name of the subdirectory it belongs to,
     and uses a stable hash to assign it to a data set partition.
     Args:
       silence_percentage: How much of the resulting data should be background.

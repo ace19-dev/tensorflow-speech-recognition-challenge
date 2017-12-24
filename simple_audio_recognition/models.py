@@ -167,12 +167,7 @@ def create_single_fc_model(fingerprint_input, model_settings, is_training):
 
 
 def create_conv_model(fingerprint_input, model_settings, is_training):
-  """Builds a standard convolutional model.
-
-  This is roughly the network labeled as 'cnn-trad-fpool3' in the
-  'Convolutional Neural Networks for Small-footprint Keyword Spotting' paper:
-  http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf
-
+  """Builds a mobilenet model.
   Here's the layout of the graph:
 
   (fingerprint_input)
@@ -197,13 +192,6 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
           v
       [BiasAdd]<-(bias)
           v
-
-  This produces fairly good quality results, but can involve a large number of
-  weight parameters and computations. For a cheaper alternative from the same
-  paper with slightly less accuracy, see 'low_latency_conv' below.
-
-  During training, dropout nodes are introduced after each relu, controlled by a
-  placeholder.
 
   Args:
     fingerprint_input: TensorFlow node that will output audio feature vectors.
@@ -272,7 +260,6 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
 
   flattened_second_conv = tf.reshape(second_dropout,
                                      [-1, second_conv_element_count])
-
 
   # label_count = 12 = x + 2
   label_count = model_settings['label_count']
