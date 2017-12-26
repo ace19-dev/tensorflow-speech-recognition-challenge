@@ -5,8 +5,7 @@
 
 | M2              | Conv / s2 </br> Conv dw / s1 </br> Conv / s1 </br> Conv dw / s2 </br> Conv / s1  </br> Avg Pool / s1 | 3 x 3 x 1 x 32  </br> 3 x 3 x 32 x 32 </br> 1 x 1 x 32 x 64</br>  3 x 3 x 64 x 64 </br> 1 x 1 x 64 x 128 | 65 x 40 x 1 </br> 32 x 19 x 32 </br> 32 x 19 x 32 </br> 32 x 19 x 64  </br> 15 x 9 x 64 </br> 15 x 9 x 128 </br> 15 x 9 x 128 | 123.6K       |
 
-| M3              | Conv / s2 </br> Conv dw / s1 </br> Conv / s1 </br> Conv dw / s2 </br> Conv / s1  </br> Conv dw / s1 </br>
-Conv / s1 </br> Avg Pool / s1 | 3 x 3 x 1 x 32  </br> 3 x 3 x 32 x 32 </br> 1 x 1 x 32 x 64</br>  3 x 3 x 64 x 64 </br> 1 x 1 x 64 x 128 | 65 x 40 x 1 </br> 32 x 19 x 32 </br> 32 x 19 x 32 </br> 32 x 19 x 64  </br> 15 x 9 x 64 </br> 15 x 9 x 128 </br> 15 x 9 x 128 | 123.6K       |
+| M3              | Conv / s2 </br> Conv dw / s1 </br> Conv / s1 </br> Conv dw / s2 </br> Conv / s1  </br> Conv dw / s1 </br> Conv / s1 </br> Avg Pool / s1 | 3 x 3 x 1 x 32  </br> 3 x 3 x 32 x 32 </br> 1 x 1 x 32 x 64</br>  3 x 3 x 64 x 64 </br> 1 x 1 x 64 x 128 | 65 x 40 x 1 </br> 32 x 19 x 32 </br> 32 x 19 x 32 </br> 32 x 19 x 64  </br> 15 x 9 x 64 </br> 15 x 9 x 128 </br> 15 x 9 x 128 | 123.6K       |
 
 | cnn-trad-fpool3 | Conv2d </br> MaxPool </br> Conv2d                                                 |                                                                                  | 65 x 40 x 64 </br> 33 x 20 x 64 </br> 33 x 20 x 64                                                   | 250.9K       |
 
