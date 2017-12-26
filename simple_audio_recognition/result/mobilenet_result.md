@@ -1,11 +1,3 @@
-### Model features
-| Network Name    | Architecture                                                          | Filter </br> (H, W, C, N)                                                                      | Feature Size (height, width, channels)                                                                            | Memory Usage |
-  |-----------------|-----------------------------------------------------------------------|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|--------------|
-  | M1              | Conv / s2 </br> Conv dw / s1 </br> Conv / s1 </br> Avg Pool / s1                        | 3 x 3 x 1 x 32  </br> 3 x 3 x 32 x 32 </br> 1 x 1 x 32 x 64                                  | 65 x 40 x 1 </br> 32 x 19 x 32 </br> 32 x 19 x 32 </br> 32 x 19 x 64                                       | 80.6K        |
-  | M2              | Conv / s2 </br> Conv dw / s1 </br> Conv / s1 </br> Conv dw / s2 </br> Conv / s1  </br> Avg Pool / s1 | 3 x 3 x 1 x 32  </br> 3 x 3 x 32 x 32 </br> 1 x 1 x 32 x 64</br>  3 x 3 x 64 x 64 </br> 1 x 1 x 64 x 128 | 65 x 40 x 1 </br> 32 x 19 x 32 </br> 32 x 19 x 32 </br> 32 x 19 x 64  </br> 15 x 9 x 64 </br> 15 x 9 x 128 | 123.6K       |
-  | M3              | Conv / s2 </br> Conv dw / s1 </br> Conv / s1 </br> Conv dw / s2 </br> Conv / s1  </br>Conv dw / s1</br> Conv / s1 </br> Avg Pool / s1 | 3 x 3 x 1 x 32  </br> 3 x 3 x 32 x 32 </br> 1 x 1 x 32 x 64</br>  3 x 3 x 64 x 64 </br> 1 x 1 x 64 x 128 </br> 3 x 3 x 128 x 128 </br> 1 x 1 x 128 x 128 </br> Pool 7 x 7 | 65 x 40 x 1 </br> 32 x 19 x 32 </br> 32 x 19 x 32 </br> 32 x 19 x 64  </br> 15 x 9 x 64 </br> 15 x 9 x 128 </br> 13 x 7 x 128 </br> 13 x 7 x 128 </br> 7 x 1 x 128 | 130.5K       |
-|                 |                                                                       |                                                                                  |                                                                                          |              |
- | cnn-trad-fpool3 | Conv2d </br> MaxPool </br> Conv2d                                                 |                                                                                  | 65 x 40 x 64 </br> 33 x 20 x 64 </br> 33 x 20 x 64                                                   | 250.9K       |
 
 
 ### Results
@@ -17,6 +9,15 @@
 | M2    | 94.2%    | 7000/5000/4000 | 0.008/0.0005/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
 | M2    | 94.8%    | 7000/5000/4000 | 0.007/0.0004/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
 | M3    | 95.6%    | 4000/5000/7000 | 0.005/0.0002/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
+
+### Model features
+| Network Name    | Architecture                                                          | Filter </br> (H, W, C, N)                                                                      | Feature Size (height, width, channels)                                                                            | Memory Usage |
+  |-----------------|-----------------------------------------------------------------------|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|--------------|
+  | M1              | Conv / s2 </br> Conv dw / s1 </br> Conv / s1 </br> Avg Pool / s1                        | 3 x 3 x 1 x 32  </br> 3 x 3 x 32 x 32 </br> 1 x 1 x 32 x 64                                  | 65 x 40 x 1 </br> 32 x 19 x 32 </br> 32 x 19 x 32 </br> 32 x 19 x 64                                       | 80.6K        |
+  | M2              | Conv / s2 </br> Conv dw / s1 </br> Conv / s1 </br> Conv dw / s2 </br> Conv / s1  </br> Avg Pool / s1 | 3 x 3 x 1 x 32  </br> 3 x 3 x 32 x 32 </br> 1 x 1 x 32 x 64</br>  3 x 3 x 64 x 64 </br> 1 x 1 x 64 x 128 | 65 x 40 x 1 </br> 32 x 19 x 32 </br> 32 x 19 x 32 </br> 32 x 19 x 64  </br> 15 x 9 x 64 </br> 15 x 9 x 128 | 123.6K       |
+  | M3              | Conv / s2 </br> Conv dw / s1 </br> Conv / s1 </br> Conv dw / s2 </br> Conv / s1  </br>Conv dw / s1</br> Conv / s1 </br> Avg Pool / s1 | 3 x 3 x 1 x 32  </br> 3 x 3 x 32 x 32 </br> 1 x 1 x 32 x 64</br>  3 x 3 x 64 x 64 </br> 1 x 1 x 64 x 128 </br> 3 x 3 x 128 x 128 </br> 1 x 1 x 128 x 128 </br> Pool 7 x 7 | 65 x 40 x 1 </br> 32 x 19 x 32 </br> 32 x 19 x 32 </br> 32 x 19 x 64  </br> 15 x 9 x 64 </br> 15 x 9 x 128 </br> 13 x 7 x 128 </br> 13 x 7 x 128 </br> 7 x 1 x 128 | 130.5K       |
+|                 |                                                                       |                                                                                  |                                                                                          |              |
+ | cnn-trad-fpool3 | Conv2d </br> MaxPool </br> Conv2d                                                 |                                                                                  | 65 x 40 x 64 </br> 33 x 20 x 64 </br> 33 x 20 x 64                                                   | 250.9K       |
 
 
 ### Tensorboard
