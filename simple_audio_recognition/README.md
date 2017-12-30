@@ -1,13 +1,14 @@
-## Simple Audio Recognition tutorial
+## How does this Model Work?
 - https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/speech_commands
 - It's solved that issue by defining a window of time we believe our spoken words should fit into, and converting the audio signal in that window into an image.
-- This is done by grouping the incoming audio samples into short segments, just a few milliseconds long, and calculating the strength of the frequencies across a set of bands.
-- Each set of frequency strengths from a segment is treated as a vector of numbers, and those vectors are arranged in time order to form a two-dimensional array.
-- This array of values can then be treated like a single-channel image, and is known as a spectrogram.
-- do further processing to this representation to turn it into a set of Mel-Frequency Cepstral Coefficients, or MFCCs for short.
+  - This is done by grouping the incoming audio samples into short segments, just a few milliseconds long, and calculating the strength of the frequencies across a set of bands.
+  - Each set of frequency strengths from a segment is treated as a vector of numbers, and those vectors are arranged in time order to form a two-dimensional array.
+  - This array of values can then be treated like a single-channel image, and is known as a spectrogram.
+- It's been traditional in speech recognition to do further processing to this representation to turn it into a set of Mel-Frequency Cepstral Coefficients, or MFCCs for short. 
+  - This is also a two-dimensional, one-channel representation so it can be treated like an image too
+  - If you're targeting general sounds rather than speech you may find you can skip this step and operate directly on the spectrograms.
 
-
-## How does this Model Work?
+## Our goal
 - The architecture used in this tutorial is based on some described in the paper Convolutional Neural Networks for Small-footprint Keyword Spotting. (http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
 - We must limit the overall computation
   - We limit the number of multiplications
