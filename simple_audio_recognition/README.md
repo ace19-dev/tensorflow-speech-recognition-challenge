@@ -27,6 +27,7 @@
 - Other parameters to customize
   - tweak the spectrogram creation parameters
   - If you make the input smaller, the model will need fewer computations to process it
+  - high enough sample rate
   - --window_stride_ms
   - --dct_coefficient_count
   - --window_size_ms
