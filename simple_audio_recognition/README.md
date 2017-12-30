@@ -8,7 +8,8 @@
   - This is also a two-dimensional, one-channel representation so it can be treated like an image too
   - If you're targeting general sounds rather than speech you may find you can skip this step and operate directly on the spectrograms.
 
-## Our goal
+
+## goal
 - The architecture used in this tutorial is based on some described in the paper Convolutional Neural Networks for Small-footprint Keyword Spotting. (http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf)
 - We must limit the overall computation
   - We limit the number of multiplications
@@ -16,7 +17,6 @@
     - Have the time filter span all of time.
   - We limit the number of parameters
 - Must have a small memory footprint and low computational power.
-- Spectral representations of speech have strong correlations in time and frequency
 
 
 ## tuning point
