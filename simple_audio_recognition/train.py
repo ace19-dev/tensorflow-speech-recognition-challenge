@@ -68,6 +68,7 @@ from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
 import input_data
+import test_data
 import models
 from tensorflow.python.platform import gfile
 
@@ -185,6 +186,20 @@ def main(_):
       os.path.join(FLAGS.train_dir, FLAGS.model_architecture + '_labels.txt'),'w') as f:
     f.write('\n'.join(audio_processor.words_list))
 
+
+
+  # audio_processor2 = test_data.AudioProcessor(
+  #     FLAGS.data_dir,
+  #     FLAGS.test_data_dir,
+  #     FLAGS.silence_percentage,
+  #     FLAGS.unknown_percentage,
+  #     FLAGS.wanted_words.split(','),
+  #     model_settings
+  #     # FLAGS.validation_percentage,
+  #     # FLAGS.testing_percentage,
+  #     )
+
+
   # Training loop.
   training_steps_max = np.sum(training_steps_list)
   for training_step in xrange(start_step, training_steps_max + 1):
@@ -253,6 +268,8 @@ def main(_):
       tf.logging.info('Saving to "%s-%d"', checkpoint_path, training_step)
       saver.save(sess, checkpoint_path, global_step=training_step)
 
+
+  # for testing
   set_size = audio_processor.set_size('testing')
   tf.logging.info('set_size=%d', set_size)
   total_accuracy = 0
@@ -274,8 +291,95 @@ def main(_):
     else:
       total_conf_matrix += conf_matrix
   tf.logging.info('Confusion Matrix:\n %s' % (total_conf_matrix))
-  tf.logging.info('Final test accuracy = %.1f%% (N=%d)' % (total_accuracy * 100,
-                                                           set_size))
+  tf.logging.info('Final test accuracy = %.1f%% (N=%d)' % (total_accuracy * 100, set_size))
+
+
+
+  # # Now we want to predict testset and make submission file.
+  # # Create datagenerator and input_function Load model Iterate over predictions and store results
+  # from tqdm import tqdm
+  # from glob import glob
+  # from scipy.io import wavfile
+  # from tensorflow.contrib import signal
+  # from tensorflow.contrib.learn.python.learn.learn_io.generator_io import generator_input_fn
+  #
+  # DATADIR = '../../../dl_data/speech_commands/'  # unzipped train and test data
+  # POSSIBLE_LABELS = 'yes no up down left right on off stop go silence unknown'.split()
+  # params = dict(
+  #     seed=2018,
+  #     batch_size=64,
+  #     keep_prob=0.5,
+  #     learning_rate=1e-3,
+  #     clip_gradients=15.0,
+  #     use_batch_norm=True,
+  #     num_classes=len(POSSIBLE_LABELS),
+  # )
+  #
+  # hparams = tf.contrib.training.HParams(**params)
+  # model_dir = './models'  # folder for model, checkpoints, logs and submission.csv
+  # run_config = tf.contrib.learn.RunConfig(model_dir=model_dir)
+  #
+  # # now we want to predict!
+  # paths = gfile.Glob(os.path.join(DATADIR, 'test/audio/*wav'))
+  #
+  # def test_data_generator(data):
+  #     def generator():
+  #         for path in data:
+  #             _, wav = wavfile.read(path)
+  #             wav = wav.astype(np.float32) / np.iinfo(np.int16).max
+  #             fname = os.path.basename(path)
+  #             yield dict(
+  #                 sample=np.string_(fname),
+  #                 wav=wav,
+  #             )
+  #
+  #     return generator
+  #
+  # test_input_fn = generator_input_fn(
+  #     x=test_data_generator(paths),
+  #     batch_size=hparams.batch_size,
+  #     shuffle=False,
+  #     num_epochs=1,
+  #     queue_capacity=10 * hparams.batch_size,
+  #     num_threads=1,
+  # )
+  #
+  # def model_handler(features, labels, mode, params, config):
+  #     predictions = {
+  #         'label': tf.argmax(logits, axis=-1),  # for probability just take tf.nn.softmax()
+  #         'sample': features['sample'],  # it's a hack for simplicity
+  #     }
+  #     specs = dict(
+  #         mode=mode,
+  #         predictions=predictions,
+  #     )
+  #
+  #     return tf.estimator.EstimatorSpec(**specs)
+  #
+  # def create_model(config=None, hparams=None):
+  #     return tf.estimator.Estimator(
+  #         model_fn=model_handler,
+  #         config=config,
+  #         params=hparams,
+  #     )
+  #
+  # model = create_model(config=run_config, hparams=hparams)
+  # it = model.predict(input_fn=test_input_fn)
+  #
+  # id2name = {i: name for i, name in enumerate(POSSIBLE_LABELS)}
+  # # last batch will contain padding, so remove duplicates
+  # submission = dict()
+  # for t in tqdm(it):
+  #     fname, label = t['sample'].decode(), id2name[t['label']]
+  #     submission[fname] = label
+  #
+  # with open(os.path.join(model_dir, 'submission.csv'), 'w') as fout:
+  #     fout.write('fname,label\n')
+  #     for fname, label in submission.items():
+  #         fout.write('{},{}\n'.format(fname, label))
+
+
+
 
 
 if __name__ == '__main__':
@@ -294,6 +398,13 @@ if __name__ == '__main__':
       help="""\
       Where to download the speech training data to.
       """)
+  parser.add_argument(
+      '--test_data_dir',
+      type=str,
+      default='../../../dl_data/speech_commands/test/audio/',
+      help="""\
+        Where is speech testing data.
+        """)
   parser.add_argument(
       '--background_volume',
       type=float,
@@ -367,7 +478,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='8000,5000',
+      default='1000,500',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -377,7 +488,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.001,0.0005',
+      default='0.005,0.0001',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
@@ -387,7 +498,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--summaries_dir',
       type=str,
-      default='../../../dl_data/speech_commands/retrain_logs',
+      default='./models/retrain_logs',
       help='Where to save summary logs for TensorBoard.')
   parser.add_argument(
       '--wanted_words',
@@ -397,7 +508,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--train_dir',
       type=str,
-      default='../../../dl_data/speech_commands/speech_commands_train',
+      default='./models',
       help='Directory to write event logs and checkpoint.')
   parser.add_argument(
       '--save_step_interval',
