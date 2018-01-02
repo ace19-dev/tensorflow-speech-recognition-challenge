@@ -248,15 +248,15 @@ class AudioProcessor(object):
     #                     ', '.join(all_words.keys()))
     # We need an arbitrary file to load as the input for the silence samples.
     # It's multiplied by zero later, so the content doesn't matter.
-    silence_wav_path = self.data_index['testing'][0]['file']
-    for set_index in ['testing']:
-      set_size = len(self.data_index[set_index])
-      silence_size = int(math.ceil(set_size * silence_percentage / 100))
-      for _ in range(silence_size):
-        self.data_index[set_index].append({
-            # 'label': SILENCE_LABEL,
-            'file': silence_wav_path
-        })
+    # silence_wav_path = self.data_index['testing'][0]['file']
+    # for set_index in ['testing']:
+    #   set_size = len(self.data_index[set_index])
+    #   silence_size = int(math.ceil(set_size * silence_percentage / 100))
+    #   for _ in range(silence_size):
+    #     self.data_index[set_index].append({
+    #         # 'label': SILENCE_LABEL,
+    #         'file': silence_wav_path
+    #     })
       # Pick some unknowns to add to each partition of the data set.
       # random.shuffle(unknown_index[set_index])
       # unknown_size = int(math.ceil(set_size * unknown_percentage / 100))
@@ -400,7 +400,7 @@ class AudioProcessor(object):
       sample_count = max(0, min(how_many, len(candidates) - offset))
     # Data and labels will be populated and returned.
     data = np.zeros((sample_count, model_settings['fingerprint_size']))
-    labels = np.zeros((sample_count, model_settings['label_count']))
+    # labels = np.zeros((sample_count, model_settings['label_count']))
     desired_samples = model_settings['desired_samples']
     use_background = self.background_data and (mode == 'training')
     pick_deterministically = (mode != 'training')
@@ -448,15 +448,17 @@ class AudioProcessor(object):
       input_dict[self.background_data_placeholder_] = background_reshaped
       input_dict[self.background_volume_placeholder_] = background_volume
       # If we want silence, mute out the main sample but leave the background.
-      if sample['label'] == SILENCE_LABEL:
-        input_dict[self.foreground_volume_placeholder_] = 0
-      else:
-        input_dict[self.foreground_volume_placeholder_] = 1
+      # if sample['label'] == SILENCE_LABEL:
+      #   input_dict[self.foreground_volume_placeholder_] = 0
+      # else:
+      #   input_dict[self.foreground_volume_placeholder_] = 1
+
+      input_dict[self.foreground_volume_placeholder_] = 1
       # Run the graph to produce the output audio.
       data[i - offset, :] = sess.run(self.mfcc_, feed_dict=input_dict).flatten()
-      label_index = self.word_to_index[sample['label']]
-      labels[i - offset, label_index] = 1
-    return data, labels
+      # label_index = self.word_to_index[sample['label']]
+      # labels[i - offset, label_index] = 1
+    return data #, labels
 
   def get_unprocessed_data(self, how_many, model_settings, mode):
     """Retrieve sample data for the given partition, with no transformations.

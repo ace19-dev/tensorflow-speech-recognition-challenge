@@ -188,16 +188,33 @@ def main(_):
 
 
 
-  # audio_processor2 = test_data.AudioProcessor(
-  #     FLAGS.data_dir,
-  #     FLAGS.test_data_dir,
-  #     FLAGS.silence_percentage,
-  #     FLAGS.unknown_percentage,
-  #     FLAGS.wanted_words.split(','),
-  #     model_settings
-  #     # FLAGS.validation_percentage,
-  #     # FLAGS.testing_percentage,
-  #     )
+
+  audio_processor2 = test_data.AudioProcessor(
+      FLAGS.data_dir,
+      FLAGS.test_data_dir,
+      FLAGS.silence_percentage,
+      FLAGS.unknown_percentage,
+      FLAGS.wanted_words.split(','),
+      model_settings
+      # FLAGS.validation_percentage,
+      # FLAGS.testing_percentage,
+      )
+  print('testing data size: ', audio_processor2.set_size('testing'))
+  set_size = audio_processor2.set_size('testing')
+  for i in xrange(0, set_size, FLAGS.batch_size):
+      # Pull the audio samples we'll use for testing.
+    testing_fingerprints = audio_processor2.get_data(
+        FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
+    # test_accuracy, conf_matrix = sess.run(
+    #     [evaluation_step, confusion_matrix],
+    #     feed_dict={
+    #         fingerprint_input: test_fingerprints,
+    #         ground_truth_input: test_ground_truth,
+    #         dropout_prob: 1.0
+    #     })
+    batch_size = min(FLAGS.batch_size, set_size - i)
+
+
 
 
   # Training loop.
