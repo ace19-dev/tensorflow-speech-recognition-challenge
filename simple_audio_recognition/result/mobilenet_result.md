@@ -8,7 +8,7 @@
 | M2    | 93.8%    | 8000/5000/3000 | 0.01/0.002/0.0001   | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 100           | 16000       |
 | M2    | 94.2%    | 7000/5000/4000 | 0.008/0.0005/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
 | M2    | 94.8%    | 7000/5000/4000 | 0.007/0.0004/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
-| M3    | 95.6%    | 4000/5000/7000 | 0.005/0.0002/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
+| M3    | 95.7%    | 4000/5000/7000 | 0.005/0.0002/0.0001 | 100        | RMSPropOptimizer         | Relu                | 10                 | 10                 | 150           | 16000       |
 
 ### Model features
 | Network Name    | Architecture                                                          | Filter </br> (H, W, C, N)                                                                      | Feature Size (height, width, channels)                                                                            | Memory Usage |
