@@ -142,13 +142,12 @@ def save_wav_file(filename, wav_data, sample_rate):
 class AudioProcessor(object):
   """Handles loading, partitioning, and preparing audio training data."""
 
-  def __init__(self, data_dir, test_data_dir, silence_percentage, unknown_percentage,
-               wanted_words, model_settings, validation_percentage=0, testing_percentage=100):
+  def __init__(self, data_dir, test_data_dir, wanted_words,
+               model_settings, validation_percentage=0, testing_percentage=100):
     self.data_dir = data_dir
     self.test_data_dir = test_data_dir
     # self.maybe_download_and_extract_dataset(data_url, data_dir)
-    self.prepare_data_index(silence_percentage, unknown_percentage,
-                            wanted_words, validation_percentage, testing_percentage)
+    self.prepare_data_index(wanted_words, validation_percentage, testing_percentage)
     self.prepare_background_data()
     self.prepare_processing_graph(model_settings)
 
@@ -191,8 +190,7 @@ class AudioProcessor(object):
                       statinfo.st_size)
     tarfile.open(filepath, 'r:gz').extractall(dest_directory)
 
-  def prepare_data_index(self, silence_percentage, unknown_percentage,
-                         wanted_words, validation_percentage, testing_percentage):
+  def prepare_data_index(self, wanted_words, validation_percentage, testing_percentage):
     """Prepares a list of the samples organized by set and label.
     The training loop needs a list of all the available data, organized by
     which partition it should belong to, and with ground truth labels attached.
@@ -400,7 +398,7 @@ class AudioProcessor(object):
       sample_count = max(0, min(how_many, len(candidates) - offset))
     # Data and labels will be populated and returned.
     data = np.zeros((sample_count, model_settings['fingerprint_size']))
-    # labels = np.zeros((sample_count, model_settings['label_count']))
+    labels = np.zeros((sample_count, model_settings['label_count']))
     desired_samples = model_settings['desired_samples']
     use_background = self.background_data and (mode == 'training')
     pick_deterministically = (mode != 'training')
@@ -413,6 +411,8 @@ class AudioProcessor(object):
       else:
         sample_index = np.random.randint(len(candidates))
       sample = candidates[sample_index]
+      fname = os.path.basename(sample['file'])
+
       # If we're time shifting, set up the offset for this sample.
       if time_shift > 0:
         time_shift_amount = np.random.randint(-time_shift, time_shift)
@@ -458,7 +458,7 @@ class AudioProcessor(object):
       data[i - offset, :] = sess.run(self.mfcc_, feed_dict=input_dict).flatten()
       # label_index = self.word_to_index[sample['label']]
       # labels[i - offset, label_index] = 1
-    return data #, labels
+    return fname, data #, labels
 
   def get_unprocessed_data(self, how_many, model_settings, mode):
     """Retrieve sample data for the given partition, with no transformations.
