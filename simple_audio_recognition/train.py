@@ -68,7 +68,6 @@ from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
 import input_data
-import test_data
 import models
 from tensorflow.python.platform import gfile
 
@@ -187,273 +186,98 @@ def main(_):
       os.path.join(FLAGS.train_dir, FLAGS.model_architecture + '_labels.txt'),'w') as f:
     f.write('\n'.join(audio_processor.words_list))
 
+  # Training loop.
+  training_steps_max = np.sum(training_steps_list)
+  for training_step in xrange(start_step, training_steps_max + 1):
+    # Figure out what the current learning rate is.
+    training_steps_sum = 0
+    for i in range(len(training_steps_list)):
+      training_steps_sum += training_steps_list[i]
+      if training_step <= training_steps_sum:
+        learning_rate_value = learning_rates_list[i]
+        break
+    # Pull the audio samples we'll use for training.
+    train_fingerprints, train_ground_truth = audio_processor.get_data(
+        FLAGS.batch_size, 0, model_settings, FLAGS.background_frequency,
+        FLAGS.background_volume, time_shift_samples, 'training', sess)
+    # Run the graph with this batch of training data.
+    train_summary, train_accuracy, cross_entropy_value, _, _ = sess.run(
+        [
+            merged_summaries, evaluation_step, cross_entropy_mean, train_step,
+            increment_global_step
+        ],
+        feed_dict={
+            fingerprint_input: train_fingerprints,
+            ground_truth_input: train_ground_truth,
+            learning_rate_input: learning_rate_value,
+            dropout_prob: 0.5
+        })
+    train_writer.add_summary(train_summary, training_step)
+    tf.logging.info('Step #%d: rate %f, accuracy %.1f%%, cross entropy %f' %
+                    (training_step, learning_rate_value, train_accuracy * 100,
+                     cross_entropy_value))
 
-
-  # # Training loop.
-  # training_steps_max = np.sum(training_steps_list)
-  # for training_step in xrange(start_step, training_steps_max + 1):
-  #   # Figure out what the current learning rate is.
-  #   training_steps_sum = 0
-  #   for i in range(len(training_steps_list)):
-  #     training_steps_sum += training_steps_list[i]
-  #     if training_step <= training_steps_sum:
-  #       learning_rate_value = learning_rates_list[i]
-  #       break
-  #   # Pull the audio samples we'll use for training.
-  #   train_fingerprints, train_ground_truth = audio_processor.get_data(
-  #       FLAGS.batch_size, 0, model_settings, FLAGS.background_frequency,
-  #       FLAGS.background_volume, time_shift_samples, 'training', sess)
-  #   # Run the graph with this batch of training data.
-  #   train_summary, train_accuracy, cross_entropy_value, _, _ = sess.run(
-  #       [
-  #           merged_summaries, evaluation_step, cross_entropy_mean, train_step,
-  #           increment_global_step
-  #       ],
-  #       feed_dict={
-  #           fingerprint_input: train_fingerprints,
-  #           ground_truth_input: train_ground_truth,
-  #           learning_rate_input: learning_rate_value,
-  #           dropout_prob: 0.5
-  #       })
-  #   train_writer.add_summary(train_summary, training_step)
-  #   tf.logging.info('Step #%d: rate %f, accuracy %.1f%%, cross entropy %f' %
-  #                   (training_step, learning_rate_value, train_accuracy * 100,
-  #                    cross_entropy_value))
-  #
-  #   is_last_step = (training_step == training_steps_max)
-  #   if (training_step % FLAGS.eval_step_interval) == 0 or is_last_step:
-  #     set_size = audio_processor.set_size('validation')
-  #     total_accuracy = 0
-  #     total_conf_matrix = None
-  #     for i in xrange(0, set_size, FLAGS.batch_size):
-  #       validation_fingerprints, validation_ground_truth = (
-  #           audio_processor.get_data(FLAGS.batch_size, i, model_settings, 0.0,
-  #                                    0.0, 0, 'validation', sess))
-  #       # Run a validation step and capture training summaries for TensorBoard
-  #       # with the `merged` op.
-  #       validation_summary, validation_accuracy, conf_matrix = sess.run(
-  #           [merged_summaries, evaluation_step, confusion_matrix],
-  #           feed_dict={
-  #               fingerprint_input: validation_fingerprints,
-  #               ground_truth_input: validation_ground_truth,
-  #               dropout_prob: 1.0
-  #           })
-  #       validation_writer.add_summary(validation_summary, training_step)
-  #       batch_size = min(FLAGS.batch_size, set_size - i)
-  #       total_accuracy += (validation_accuracy * batch_size) / set_size
-  #       if total_conf_matrix is None:
-  #         total_conf_matrix = conf_matrix
-  #       else:
-  #         total_conf_matrix += conf_matrix
-  #     tf.logging.info('Confusion Matrix:\n %s' % (total_conf_matrix))
-  #     tf.logging.info('Step %d: Validation accuracy = %.1f%% (N=%d)' %
-  #                     (training_step, total_accuracy * 100, set_size))
-  #
-  #   # Save the model checkpoint periodically.
-  #   if (training_step % FLAGS.save_step_interval == 0 or
-  #       training_step == training_steps_max):
-  #     checkpoint_path = os.path.join(FLAGS.train_dir,
-  #                                    FLAGS.model_architecture + '.ckpt')
-  #     tf.logging.info('Saving to "%s-%d"', checkpoint_path, training_step)
-  #     saver.save(sess, checkpoint_path, global_step=training_step)
-  #
-  #
-  # # for testing
-  # set_size = audio_processor.set_size('testing')
-  # tf.logging.info('set_size=%d', set_size)
-  # total_accuracy = 0
-  # total_conf_matrix = None
-  # for i in xrange(0, set_size, FLAGS.batch_size):
-  #   test_fingerprints, test_ground_truth = audio_processor.get_data(
-  #       FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
-  #   test_accuracy, conf_matrix = sess.run(
-  #       [evaluation_step, confusion_matrix],
-  #       feed_dict={
-  #           fingerprint_input: test_fingerprints,
-  #           ground_truth_input: test_ground_truth,
-  #           dropout_prob: 1.0
-  #       })
-  #   batch_size = min(FLAGS.batch_size, set_size - i)
-  #   total_accuracy += (test_accuracy * batch_size) / set_size
-  #   if total_conf_matrix is None:
-  #     total_conf_matrix = conf_matrix
-  #   else:
-  #     total_conf_matrix += conf_matrix
-  # tf.logging.info('Confusion Matrix:\n %s' % (total_conf_matrix))
-  # tf.logging.info('Final test accuracy = %.1f%% (N=%d)' % (total_accuracy * 100, set_size))
-
-
-
-
-
-
-
-  # Now we want to predict testset and make submission file.
-  # Create datagenerator and input_function Load model Iterate over predictions and store results
-  from tqdm import tqdm
-  from tensorflow.contrib.learn.python.learn.learn_io.generator_io import generator_input_fn
-
-  # DATADIR = '../../../dl_data/speech_commands/'  # unzipped train and test data
-  POSSIBLE_LABELS = 'yes no up down left right on off stop go silence unknown'.split()
-  params = dict(
-    seed=2018,
-    batch_size=100,
-    keep_prob=0.5,
-    learning_rate=1e-3,
-    clip_gradients=15.0,
-    use_batch_norm=True,
-    num_classes=len(POSSIBLE_LABELS)
-  )
-
-  hparams = tf.contrib.training.HParams(**params)
-  model_dir = './models'  # folder for model, checkpoints, logs and submission.csv
-  run_config = tf.contrib.learn.RunConfig()
-  run_config = run_config.replace(model_dir=model_dir)
-
-  # now we want to predict!
-  # paths = gfile.Glob(os.path.join(FLAGS.test_data_dir, '*wav'))
-
-  audio_processor2 = test_data.AudioProcessor(
-    FLAGS.data_dir,
-    FLAGS.test_data_dir,
-    FLAGS.silence_percentage,
-    FLAGS.unknown_percentage,
-    FLAGS.wanted_words.split(','),
-    model_settings
-    # FLAGS.validation_percentage,
-    # FLAGS.testing_percentage,
-  )
-  print('testing data size: ', audio_processor2.set_size('testing'))
-  set_size = audio_processor2.set_size('testing')
-  def test_data_generator():
-    def generator():
-      # for path in data:
-      #     _, wav = wavfile.read(path)
-      #     wav = wav.astype(np.float32) / np.iinfo(np.int16).max
-      #     fname = os.path.basename(path)
-      #     yield dict(
-      #         sample=np.string_(fname),
-      #         wav=wav,
-      #     )
+    is_last_step = (training_step == training_steps_max)
+    if (training_step % FLAGS.eval_step_interval) == 0 or is_last_step:
+      set_size = audio_processor.set_size('validation')
+      total_accuracy = 0
+      total_conf_matrix = None
       for i in xrange(0, set_size, FLAGS.batch_size):
-        # Pull the audio samples we'll use for testing.
-        fname, fingerprints = audio_processor2.get_data(
-            FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
-        # batch_size = min(FLAGS.batch_size, set_size - i)
-        yield dict(
-          sample=np.string_(fname),
-          input_data=fingerprints
-        )
-    return generator
+        validation_fingerprints, validation_ground_truth = (
+            audio_processor.get_data(FLAGS.batch_size, i, model_settings, 0.0,
+                                     0.0, 0, 'validation', sess))
+        # Run a validation step and capture training summaries for TensorBoard
+        # with the `merged` op.
+        validation_summary, validation_accuracy, conf_matrix = sess.run(
+            [merged_summaries, evaluation_step, confusion_matrix],
+            feed_dict={
+                fingerprint_input: validation_fingerprints,
+                ground_truth_input: validation_ground_truth,
+                dropout_prob: 1.0
+            })
+        validation_writer.add_summary(validation_summary, training_step)
+        batch_size = min(FLAGS.batch_size, set_size - i)
+        total_accuracy += (validation_accuracy * batch_size) / set_size
+        if total_conf_matrix is None:
+          total_conf_matrix = conf_matrix
+        else:
+          total_conf_matrix += conf_matrix
+      tf.logging.info('Confusion Matrix:\n %s' % (total_conf_matrix))
+      tf.logging.info('Step %d: Validation accuracy = %.1f%% (N=%d)' %
+                      (training_step, total_accuracy * 100, set_size))
 
-  test_input_fn = generator_input_fn(
-    # x=test_data_generator(paths),
-    x=test_data_generator(),
-    batch_size=hparams.batch_size,
-    shuffle=False,
-    num_epochs=1,
-    queue_capacity=10 * hparams.batch_size,
-    num_threads=1
-  )
-
-  # def model_fn(features, labels, mode, params, config):
-  #   predictions = {
-  #     'label': tf.argmax(logits, axis=-1),  # for probability just take tf.nn.softmax()
-  #     'sample': features['sample'],  # it's a hack for simplicity
-  #   }
-  #   specs = dict(
-  #     mode=mode,
-  #     predictions=predictions,
-  #   )
-  #   return tf.estimator.EstimatorSpec(**specs)
-  def model_fn(features, labels, mode, params):
-    """Model function for Estimator."""
-
-    # Define model's architecture
-    # logits = architecture(features, is_training=is_training)
-    # logits, dropout_prob = models.create_model(
-    #   fingerprint_input,
-    #   model_settings,
-    #   FLAGS.model_architecture,
-    #   is_training=True)
-
-    # Provide an estimator spec for `ModeKeys.PREDICT`.
-    if mode == tf.estimator.ModeKeys.PREDICT:
-      predictions = {
-        'label': tf.argmax(logits, axis=-1),  # for probability just take tf.nn.softmax()
-        'sample': features['sample']
-      }
-      # predictions = tf.argmax(logits, axis=-1)
-      specs = dict(
-        mode=mode,
-        predictions=predictions
-      )
-    return tf.estimator.EstimatorSpec(**specs)
-
-  # def architecture(inputs, is_training, scope='MnistConvNet'):
-  #   """Return the output operation following the network architecture.
-  #   Args:
-  #       inputs (Tensor): Input Tensor
-  #       is_training (bool): True iff in training mode
-  #       scope (str): Name of the scope of the architecture
-  #   Returns:
-  #        Logits output Op for the network.
-  #   """
-  #   with tf.variable_scope(scope):
-  #     with slim.arg_scope(
-  #             [slim.conv2d, slim.fully_connected],
-  #             weights_initializer=tf.contrib.layers.xavier_initializer()):
-  #       net = slim.conv2d(inputs, 20, [5, 5], padding='VALID',
-  #                         scope='conv1')
-  #       net = slim.max_pool2d(net, 2, stride=2, scope='pool2')
-  #       net = slim.conv2d(net, 40, [5, 5], padding='VALID',
-  #                         scope='conv3')
-  #       net = slim.max_pool2d(net, 2, stride=2, scope='pool4')
-  #       net = tf.reshape(net, [-1, 4 * 4 * 40])
-  #       net = slim.fully_connected(net, 256, scope='fn5')
-  #       net = slim.dropout(net, is_training=is_training,
-  #                          scope='dropout5')
-  #       net = slim.fully_connected(net, 256, scope='fn6')
-  #       net = slim.dropout(net, is_training=is_training,
-  #                          scope='dropout6')
-  #       net = slim.fully_connected(net, 10, scope='output',
-  #                                  activation_fn=None)
-  #     return net
+    # Save the model checkpoint periodically.
+    if (training_step % FLAGS.save_step_interval == 0 or
+        training_step == training_steps_max):
+      checkpoint_path = os.path.join(FLAGS.train_dir,
+                                     FLAGS.model_architecture + '.ckpt')
+      tf.logging.info('Saving to "%s-%d"', checkpoint_path, training_step)
+      saver.save(sess, checkpoint_path, global_step=training_step)
 
 
-  def get_estimator(config=None, hparams=None):
-    """Return the model as a Tensorflow Estimator object.
-    Args:
-       run_config (RunConfig): Configuration for Estimator run.
-       params (HParams): hyperparameters.
-    """
-    return tf.estimator.Estimator(
-      model_fn=model_fn,
-      config=config,
-      params=hparams,
-    )
-
-  model = get_estimator(config=run_config, hparams=hparams)
-  it = model.predict(input_fn=test_input_fn)
-
-
-  id2name = {i: name for i, name in enumerate(POSSIBLE_LABELS)}
-  # last batch will contain padding, so remove duplicates
-  submission = dict()
-  for t in tqdm(it):
-    fname, label = t['sample'].decode(), id2name[t['label']]
-    submission[fname] = label
-
-  # with open(os.path.join(model_dir, 'submission.csv'), 'w') as fout:
-  #   fout.write('fname,label\n')
-  #   for fname, label in submission.items():
-  #       fout.write('{},{}\n'.format(fname, label))
-
-
-
-
-
-
+  # for testing
+  set_size = audio_processor.set_size('testing')
+  tf.logging.info('set_size=%d', set_size)
+  total_accuracy = 0
+  total_conf_matrix = None
+  for i in xrange(0, set_size, FLAGS.batch_size):
+    test_fingerprints, test_ground_truth = audio_processor.get_data(
+        FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
+    test_accuracy, conf_matrix = sess.run(
+        [evaluation_step, confusion_matrix],
+        feed_dict={
+            fingerprint_input: test_fingerprints,
+            ground_truth_input: test_ground_truth,
+            dropout_prob: 1.0
+        })
+    batch_size = min(FLAGS.batch_size, set_size - i)
+    total_accuracy += (test_accuracy * batch_size) / set_size
+    if total_conf_matrix is None:
+      total_conf_matrix = conf_matrix
+    else:
+      total_conf_matrix += conf_matrix
+  tf.logging.info('Confusion Matrix:\n %s' % (total_conf_matrix))
+  tf.logging.info('Final test accuracy = %.1f%% (N=%d)' % (total_accuracy * 100, set_size))
 
 
 if __name__ == '__main__':
