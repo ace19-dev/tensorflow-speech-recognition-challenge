@@ -735,8 +735,7 @@ def create_low_latency_svdf_model(fingerprint_input, model_settings,
 
 def create_low_latency_squeeze_model(fingerprint_input, model_settings, is_training):
     squeeze_ratio = 1
-    if is_training:
-        dropout_prob = tf.placeholder(tf.float32, name='dropout_prob')
+    dropout_prob = tf.placeholder(tf.float32, name='dropout_prob')
     input_frequency_size = model_settings['dct_coefficient_count']
     input_time_size = model_settings['spectrogram_length']
     fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size, input_frequency_size, 1])
