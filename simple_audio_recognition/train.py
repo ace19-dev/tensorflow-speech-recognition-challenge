@@ -297,13 +297,6 @@ if __name__ == '__main__':
       Where to download the speech training data to.
       """)
   parser.add_argument(
-      '--test_data_dir',
-      type=str,
-      default='../../../dl_data/speech_commands/test/audio/',
-      help="""\
-        Where is speech testing data.
-        """)
-  parser.add_argument(
       '--background_volume',
       type=float,
       default=0.2,
