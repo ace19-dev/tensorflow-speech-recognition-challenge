@@ -1,8 +1,8 @@
 
 ### tries
-|  No | Testor| Train Acc.| Pred Acc.| epoch  | Learning Rate   | Batch | Optimizer       | Activation |win_stride|win_size| time_shift|sample_rate |back_vol.|back_freq.|dct_coef.|
-|-----|-------|-----------|---------|--------|-----------------|-------|-----------------|------------|----------|--------|-----------|-------------|--------|----------|---------|
-|  1  | Sean  |          |          | 2000,3000 | 0.001,0.0005| 100   | GradientDescent | Relu       | 10       |   30   | 100       |  16000      |  0.5   |  0.8     |   40    | 
+|  No | Testor| Train Acc.| Pred Acc.| epoch    | Learning Rate   | Batch | Optimizer       | Activation |win_stride|win_size| time_shift|sample_rate |back_vol.|back_freq.|dct_coef.|
+|-----|-------|-----------|---------|-----------|------------------|-------|-----------------|------------|----------|--------|-----------|-------------|--------|----------|---------|
+|  1  | Sean  |          |          | 2000,3000 | 0.0003,0.00007| 100   | SDG             | Relu       | 10       |   30   | 100       |  16000      |  0.5   |  0.8     |   40    | 
 |  2  |       |          |          |            |             |       |                 |            |          |         |         |              |        |           |        |
 |  3  |       |          |          |            |             |       |                 |         |            |          |         |              |        |           |        |
 |  4  |       |          |          |            |             |       |                 |         |            |          |         |              |        |           |        |
