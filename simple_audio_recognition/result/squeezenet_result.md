@@ -10,6 +10,7 @@
 | M1              | 87.8%                                                            | 15000                                                                   | 0.001                                                                  | 100                               | GradientDescentOptimizer | Relu                | 10                 | 10                 | 100           | 16000       |
 | M1              | 87.3%                                                            | 15000                                                                   | 0.0005                                                                  | 100                               | GradientDescentOptimizer | Relu                | 10                 | 10                 | 100           | 16000       |
 | M1              | 89.0%                                                            | 13000                                                                   | 0.001                                                                  | 100                               | RMSPropOptimizer | Relu                | 10                 | 10                 | 100           | 16000       |
+| M1              | 90.6%                                                            | 7000/5000/3000                                                                   | 0.001/0.0005/0.0001                                                                  | 100                               | RMSPropOptimizer | Relu                | 10                 | 10                 | 100           | 16000       |
 
 
 
