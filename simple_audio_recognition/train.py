@@ -327,7 +327,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--time_shift_ms',
       type=float,
-      default=100.0,
+      default=150.0,
       help="""\
       Range to randomly shift the training audio by in time.
       """)
@@ -374,12 +374,12 @@ if __name__ == '__main__':
   parser.add_argument(
       '--eval_step_interval',
       type=int,
-      default=1000,
+      default='4000,5000,7000',
       help='How often to evaluate the training results.')
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.005,0.0001',
+      default='0.005,0.0002,0.0001',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
