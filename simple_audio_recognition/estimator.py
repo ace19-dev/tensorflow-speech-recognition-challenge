@@ -41,7 +41,7 @@ def main(_):
     seed=2018,
     batch_size=FLAGS.batch_size,
     keep_prob=0.5,
-    learning_rate=1e-3,
+    learning_rate=0.0005,
     clip_gradients=15.0,
     use_batch_norm=True,
     num_classes=len(POSSIBLE_LABELS)
