@@ -52,9 +52,6 @@ def main(_):
   run_config = tf.contrib.learn.RunConfig()
   run_config = run_config.replace(model_dir=model_dir)
 
-  # now we want to predict!
-  # paths = gfile.Glob(os.path.join(FLAGS.test_data_dir, '*wav'))
-
   audio_processor2 = test_data.AudioProcessor(
     FLAGS.data_dir,
     FLAGS.test_data_dir,
@@ -69,15 +66,6 @@ def main(_):
   set_size = audio_processor2.set_size('testing')
   def test_data_generator():
     def generator():
-      # for i in xrange(0, set_size, FLAGS.batch_size):
-      #   # Pull the audio samples we'll use for testing.
-      #   fname, fingerprints = audio_processor2.get_data(
-      #       FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
-      #   # batch_size = min(FLAGS.batch_size, set_size - i)
-      #   yield dict(
-      #     sample=np.string_(fname),
-      #     input_data=fingerprints
-      #   )
       for i in xrange(0, set_size, FLAGS.batch_size):
         # Pull the audio samples we'll use for testing.
         fname, fingerprints = audio_processor2.get_data(
