@@ -146,8 +146,11 @@ def main(_):
   with tf.name_scope('train'), tf.control_dependencies(control_dependencies):
     learning_rate_input = tf.placeholder(
         tf.float32, [], name='learning_rate_input')
-    train_step = tf.train.RMSPropOptimizer(
-        learning_rate_input, 0.9).minimize(cross_entropy_mean)
+    momentum = tf.placeholder(tf.float32, [], name='momentum')
+    # SGD
+    train_step = \
+      tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).\
+        minimize(cross_entropy_mean)
 
   predicted_indices = tf.argmax(logits, 1)
   expected_indices = tf.argmax(ground_truth_input, 1)
@@ -210,6 +213,7 @@ def main(_):
             fingerprint_input: train_fingerprints,
             ground_truth_input: train_ground_truth,
             learning_rate_input: learning_rate_value,
+            momentum:0.95,
             dropout_prob: 0.5
         })
     train_writer.add_summary(train_summary, training_step)
@@ -299,7 +303,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.3,
+      default=0.5,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
@@ -327,7 +331,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--time_shift_ms',
       type=float,
-      default=150.0,
+      default=100.0,
       help="""\
       Range to randomly shift the training audio by in time.
       """)
@@ -359,7 +363,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--window_stride_ms',
       type=float,
-      default=15.0,
+      default=10.0,
       help='How far to move in time between frequency windows',)
   parser.add_argument(
       '--dct_coefficient_count',
@@ -369,7 +373,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='4000,5000,7000',
+      default='3000,5000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -379,7 +383,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.005,0.0002,0.0001',
+      default='0.0002,0.00005',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',

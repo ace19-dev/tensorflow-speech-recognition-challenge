@@ -8,6 +8,7 @@ from __future__ import print_function
 import argparse
 import os.path
 import sys
+import csv
 
 from tqdm import tqdm
 
@@ -41,7 +42,7 @@ def main(_):
     seed=2018,
     batch_size=FLAGS.batch_size,
     keep_prob=0.5,
-    learning_rate=0.0005,
+    learning_rate=0.0003,
     clip_gradients=15.0,
     use_batch_norm=True,
     num_classes=len(POSSIBLE_LABELS)
@@ -134,10 +135,18 @@ def main(_):
     # print("fname >>> : ", fname, ", ", "label >>> : ", label)
     submission[fname] = label
 
-  with open(os.path.join(model_dir, 'submission.csv'), 'w') as fout:
-    fout.write('fname,label\n')
-    for fname, label in submission.items():
-        fout.write('{},{}\n'.format(fname, label))
+  fin = open(os.path.join(model_dir, 'sample_submission.csv'), 'rb')
+  reader = csv.reader(fin)
+  headers = reader.next()
+  fout = open(os.path.join(model_dir, 'submission.csv'), 'wb')
+  writer = csv.writer(fout)
+  writer.writerow(headers)
+  for row in reader:
+    row[1] = submission[row[0]]
+    writer.writerow(row)
+
+  fin.close()
+  fout.close()
 
 
 if __name__ == '__main__':
