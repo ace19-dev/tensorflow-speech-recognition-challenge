@@ -39,7 +39,7 @@ def main(_):
   POSSIBLE_LABELS = 'yes no up down left right on off stop go silence unknown'.split()
   params = dict(
     seed=2018,
-    batch_size=100,
+    batch_size=FLAGS.batch_size,
     keep_prob=0.5,
     learning_rate=1e-3,
     clip_gradients=15.0,
@@ -69,27 +69,30 @@ def main(_):
   set_size = audio_processor2.set_size('testing')
   def test_data_generator():
     def generator():
-      # for path in data:
-      #     _, wav = wavfile.read(path)
-      #     wav = wav.astype(np.float32) / np.iinfo(np.int16).max
-      #     fname = os.path.basename(path)
-      #     yield dict(
-      #         sample=np.string_(fname),
-      #         wav=wav,
-      #     )
+      # for i in xrange(0, set_size, FLAGS.batch_size):
+      #   # Pull the audio samples we'll use for testing.
+      #   fname, fingerprints = audio_processor2.get_data(
+      #       FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
+      #   # batch_size = min(FLAGS.batch_size, set_size - i)
+      #   yield dict(
+      #     sample=np.string_(fname),
+      #     input_data=fingerprints
+      #   )
       for i in xrange(0, set_size, FLAGS.batch_size):
         # Pull the audio samples we'll use for testing.
         fname, fingerprints = audio_processor2.get_data(
             FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
-        # batch_size = min(FLAGS.batch_size, set_size - i)
+
         yield dict(
-          sample=np.string_(fname),
+          fname=np.string_(fname),
           input_data=fingerprints
         )
+
     return generator
 
+  tmp =  test_data_generator()
+
   test_input_fn = generator_input_fn(
-    # x=test_data_generator(paths),
     x=test_data_generator(),
     batch_size=hparams.batch_size,
     shuffle=False,
@@ -98,23 +101,10 @@ def main(_):
     num_threads=1
   )
 
-  # def model_fn(features, labels, mode, params, config):
-  #   predictions = {
-  #     'label': tf.argmax(logits, axis=-1),  # for probability just take tf.nn.softmax()
-  #     'sample': features['sample'],  # it's a hack for simplicity
-  #   }
-  #   specs = dict(
-  #     mode=mode,
-  #     predictions=predictions,
-  #   )
-  #   return tf.estimator.EstimatorSpec(**specs)
   def model_fn(features, labels, mode, params):
     """Model function for Estimator."""
-
-    # Define model's architecture
-    # logits = architecture(features, is_training=is_training)
-    logits, _ = models.create_model(
-      features,
+    logits = models.create_model(
+      features['input_data'],
       model_settings,
       FLAGS.model_architecture,
       is_training=False)
@@ -122,45 +112,15 @@ def main(_):
     # Provide an estimator spec for `ModeKeys.PREDICT`.
     if mode == tf.estimator.ModeKeys.PREDICT:
       predictions = {
-        'label': tf.argmax(logits, axis=-1),  # for probability just take tf.nn.softmax()
-        'sample': features['sample']
+        'fname': features['fname'],
+        'label': tf.argmax(logits, axis=-1)
       }
-      # predictions = tf.argmax(logits, axis=-1)
       specs = dict(
         mode=mode,
         predictions=predictions
       )
     return tf.estimator.EstimatorSpec(**specs)
 
-  # def architecture(inputs, is_training, scope='MnistConvNet'):
-  #   """Return the output operation following the network architecture.
-  #   Args:
-  #       inputs (Tensor): Input Tensor
-  #       is_training (bool): True iff in training mode
-  #       scope (str): Name of the scope of the architecture
-  #   Returns:
-  #        Logits output Op for the network.
-  #   """
-  #   with tf.variable_scope(scope):
-  #     with slim.arg_scope(
-  #             [slim.conv2d, slim.fully_connected],
-  #             weights_initializer=tf.contrib.layers.xavier_initializer()):
-  #       net = slim.conv2d(inputs, 20, [5, 5], padding='VALID',
-  #                         scope='conv1')
-  #       net = slim.max_pool2d(net, 2, stride=2, scope='pool2')
-  #       net = slim.conv2d(net, 40, [5, 5], padding='VALID',
-  #                         scope='conv3')
-  #       net = slim.max_pool2d(net, 2, stride=2, scope='pool4')
-  #       net = tf.reshape(net, [-1, 4 * 4 * 40])
-  #       net = slim.fully_connected(net, 256, scope='fn5')
-  #       net = slim.dropout(net, is_training=is_training,
-  #                          scope='dropout5')
-  #       net = slim.fully_connected(net, 256, scope='fn6')
-  #       net = slim.dropout(net, is_training=is_training,
-  #                          scope='dropout6')
-  #       net = slim.fully_connected(net, 10, scope='output',
-  #                                  activation_fn=None)
-  #     return net
 
 
   def get_estimator(config=None, hparams=None):
@@ -175,21 +135,21 @@ def main(_):
       params=hparams,
     )
 
-  model = get_estimator(config=run_config, hparams=hparams)
-  it = model.predict(input_fn=test_input_fn)
-
+  estimator = get_estimator(config=run_config, hparams=hparams)
+  it = estimator.predict(input_fn=test_input_fn)
 
   id2name = {i: name for i, name in enumerate(POSSIBLE_LABELS)}
   # last batch will contain padding, so remove duplicates
   submission = dict()
   for t in tqdm(it):
-    fname, label = t['sample'].decode(), id2name[t['label']]
+    fname, label = t['fname'].decode(), id2name[t['label']]
+    # print("fname >>> : ", fname, ", ", "label >>> : ", label)
     submission[fname] = label
 
-  # with open(os.path.join(model_dir, 'submission.csv'), 'w') as fout:
-  #   fout.write('fname,label\n')
-  #   for fname, label in submission.items():
-  #       fout.write('{},{}\n'.format(fname, label))
+  with open(os.path.join(model_dir, 'submission.csv'), 'w') as fout:
+    fout.write('fname,label\n')
+    for fname, label in submission.items():
+        fout.write('{},{}\n'.format(fname, label))
 
 
 if __name__ == '__main__':
@@ -236,7 +196,7 @@ if __name__ == '__main__':
   parser.add_argument(
     '--batch_size',
     type=int,
-    default=100,
+    default=1,
     help='How many items to train with at once', )
   parser.add_argument(
       '--wanted_words',
