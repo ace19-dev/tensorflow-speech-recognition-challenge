@@ -10,6 +10,6 @@
 
 
 
-## cautions
+## tips
 - validation accuracy/loss 그래프 변화를 살펴보고 오버피팅 여부를 파악하여 epoch 값을 정한다.
 - tensorboard 를 이용한다.
