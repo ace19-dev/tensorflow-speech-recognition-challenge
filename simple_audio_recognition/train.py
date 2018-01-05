@@ -391,10 +391,10 @@ def main(_):
 
   fin = open(os.path.join(FLAGS.train_dir, 'sample_submission.csv'), 'rb')
   reader = csv.reader(fin)
-  headers = reader.next()
+  # headers = reader.next()
   fout = open(os.path.join(FLAGS.train_dir, 'submission.csv'), 'wb')
   writer = csv.writer(fout)
-  writer.writerow(headers)
+  # writer.writerow(headers)
   for row in reader:
     row[1] = submission[row[0]]
     writer.writerow(row)
