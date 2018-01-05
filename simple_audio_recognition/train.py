@@ -389,14 +389,19 @@ def main(_):
     # print("fname >>> : ", fname, ", ", "label >>> : ", label)
     submission[fname] = label
 
-  fin = open(os.path.join(FLAGS.train_dir, 'sample_submission.csv'), 'rb')
+  fin = open(os.path.join(FLAGS.result_dir, 'sample_submission.csv'), 'r', encoding='utf-8')
   reader = csv.reader(fin)
+
+  # fin = open(os.path.join(FLAGS.result_dir, 'sample_submission.csv'), 'rb')
+  # reader = csv.reader(fin)
   # headers = reader.next()
-  fout = open(os.path.join(FLAGS.train_dir, 'submission.csv'), 'wb')
+  fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'w', encoding='utf-8', newline='')
+  # fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'wb')
   writer = csv.writer(fout)
   # writer.writerow(headers)
   for row in reader:
-    row[1] = submission[row[0]]
+    if row[0] != 'fname':
+      row[1] = submission[row[0]]
     writer.writerow(row)
 
   fin.close()
@@ -429,7 +434,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.1,
+      default=0.2,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
@@ -499,7 +504,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='500,500',
+      default='3000,8000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -531,6 +536,11 @@ if __name__ == '__main__':
       type=str,
       default='./models',
       help='Directory to write event logs and checkpoint.')
+  parser.add_argument(
+    '--result_dir',
+    type=str,
+    default='./result',
+    help='Directory to write event logs and checkpoint.')
   parser.add_argument(
       '--save_step_interval',
       type=int,
