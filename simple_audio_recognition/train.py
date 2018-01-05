@@ -434,14 +434,14 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.4,
+      default=0.2,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
   parser.add_argument(
       '--background_frequency',
       type=float,
-      default=0.8,
+      default=0.9,
       help="""\
       How many of the training samples have background noise mixed in.
       """)
@@ -504,7 +504,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='2000,2000',
+      default='2000,3000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
