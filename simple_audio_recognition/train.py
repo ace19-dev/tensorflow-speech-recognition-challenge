@@ -62,6 +62,10 @@ from __future__ import print_function
 import argparse
 import os.path
 import sys
+import time
+import csv
+
+from tqdm import tqdm
 
 import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
@@ -69,7 +73,10 @@ import tensorflow as tf
 
 import input_data
 import models
+import test_data
+
 from tensorflow.python.platform import gfile
+from tensorflow.contrib.learn.python.learn.learn_io.generator_io import generator_input_fn
 
 FLAGS = None
 
@@ -115,8 +122,8 @@ def main(_):
   #fingerprint_size : 2600
   fingerprint_input = tf.placeholder(
       tf.float32, [None, fingerprint_size], name='fingerprint_input')
-  #shape of fingerprint_input : [2, ]
 
+  #shape of fingerprint_input : [2, ]
   logits, dropout_prob = models.create_model(
       fingerprint_input,
       model_settings,
@@ -284,6 +291,118 @@ def main(_):
   tf.logging.info('Final test accuracy = %.1f%% (N=%d)' % (total_accuracy * 100, set_size))
 
 
+
+  # for prediction
+  tf.logging.info('Lets prediction >>> \n')
+  POSSIBLE_LABELS = 'yes no up down left right on off stop go silence unknown'.split()
+  params = dict(
+    seed=2018,
+    batch_size=FLAGS.prediction_batch_size,
+    keep_prob=0.5,
+    learning_rate=0.0002,
+    clip_gradients=15.0,
+    use_batch_norm=True,
+    num_classes=len(POSSIBLE_LABELS)
+  )
+
+  hparams = tf.contrib.training.HParams(**params)
+  # model_dir = './models'  # folder for model, checkpoints, logs and submission.csv
+  run_config = tf.contrib.learn.RunConfig()
+  run_config = run_config.replace(model_dir=FLAGS.train_dir)
+
+  audio_processor2 = test_data.AudioProcessor(
+    FLAGS.data_dir,
+    FLAGS.test_data_dir,
+    # FLAGS.silence_percentage,
+    # FLAGS.unknown_percentage,
+    FLAGS.wanted_words.split(','),
+    model_settings
+    # FLAGS.validation_percentage,
+    # FLAGS.testing_percentage,
+  )
+  print('testing data size: ', audio_processor2.set_size('testing'))
+  set_size = audio_processor2.set_size('testing')
+
+  def test_data_generator():
+    def generator():
+      for i in xrange(0, set_size, FLAGS.prediction_batch_size):
+        # Pull the audio samples we'll use for testing.
+        fname, fingerprints = audio_processor2.get_data(
+          FLAGS.prediction_batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
+
+        yield dict(
+          fname=np.string_(fname),
+          input_data=fingerprints
+        )
+
+    return generator
+
+  test_input_fn = generator_input_fn(
+    x=test_data_generator(),
+    batch_size=hparams.batch_size,
+    shuffle=False,
+    num_epochs=1,
+    queue_capacity=10 * hparams.batch_size,
+    num_threads=1
+  )
+
+  def model_fn(features, labels, mode, params):
+    """Model function for Estimator."""
+    logits = models.create_model(
+      tf.cast(features['input_data'], tf.float32),
+      model_settings,
+      FLAGS.model_architecture,
+      is_training=False)
+
+    # Provide an estimator spec for `ModeKeys.PREDICT`.
+    if mode == tf.estimator.ModeKeys.PREDICT:
+      predictions = {
+        'fname': tf.cast(features['fname'], tf.float32),
+        'label': tf.argmax(logits, axis=-1)
+      }
+      specs = dict(
+        mode=mode,
+        predictions=predictions
+      )
+    return tf.estimator.EstimatorSpec(**specs)
+
+  def get_estimator(config=None, hparams=None):
+    """Return the model as a Tensorflow Estimator object.
+    Args:
+       run_config (RunConfig): Configuration for Estimator run.
+       params (HParams): hyperparameters.
+    """
+    return tf.estimator.Estimator(
+      model_fn=model_fn,
+      config=config,
+      params=hparams,
+    )
+
+  estimator = get_estimator(config=run_config, hparams=hparams)
+  it = estimator.predict(input_fn=test_input_fn)
+
+  id2name = {i: name for i, name in enumerate(POSSIBLE_LABELS)}
+  # last batch will contain padding, so remove duplicates
+  submission = dict()
+  for t in tqdm(it):
+    fname, label = t['fname'].decode(), id2name[t['label']]
+    # print("fname >>> : ", fname, ", ", "label >>> : ", label)
+    submission[fname] = label
+
+  fin = open(os.path.join(FLAGS.train_dir, 'sample_submission.csv'), 'rb')
+  reader = csv.reader(fin)
+  headers = reader.next()
+  fout = open(os.path.join(FLAGS.train_dir, 'submission.csv'), 'wb')
+  writer = csv.writer(fout)
+  writer.writerow(headers)
+  for row in reader:
+    row[1] = submission[row[0]]
+    writer.writerow(row)
+
+  fin.close()
+  fout.close()
+
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument(
@@ -300,6 +419,13 @@ if __name__ == '__main__':
       help="""\
       Where to download the speech training data to.
       """)
+  parser.add_argument(
+    '--test_data_dir',
+    type=str,
+    default='../../../dl_data/speech_commands/test/audio/',
+    help="""\
+          Where is speech testing data.
+          """)
   parser.add_argument(
       '--background_volume',
       type=float,
@@ -420,6 +546,11 @@ if __name__ == '__main__':
       type=str,
       default='mobile',
       help='What model architecture to use')
+  parser.add_argument(
+    '--prediction_batch_size',
+    type=int,
+    default=1,
+    help='How many items to predict with at once', )
   parser.add_argument(
       '--check_nans',
       type=bool,

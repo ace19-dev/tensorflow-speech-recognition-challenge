@@ -36,7 +36,6 @@ def main(_):
       FLAGS.sample_rate, FLAGS.clip_duration_ms, FLAGS.window_size_ms,
       FLAGS.window_stride_ms, FLAGS.dct_coefficient_count)
 
-  # DATADIR = '../../../dl_data/speech_commands/'  # unzipped train and test data
   POSSIBLE_LABELS = 'yes no up down left right on off stop go silence unknown'.split()
   params = dict(
     seed=2018,
@@ -49,9 +48,9 @@ def main(_):
   )
 
   hparams = tf.contrib.training.HParams(**params)
-  model_dir = './model'  # folder for model, checkpoints, logs and submission.csv
+  # model_dir = './models'  # folder for model, checkpoints, logs and submission.csv
   run_config = tf.contrib.learn.RunConfig()
-  run_config = run_config.replace(model_dir=model_dir)
+  run_config = run_config.replace(model_dir=FLAGS.train_dir)
 
   audio_processor2 = test_data.AudioProcessor(
     FLAGS.data_dir,
@@ -79,8 +78,6 @@ def main(_):
 
     return generator
 
-  tmp =  test_data_generator()
-
   test_input_fn = generator_input_fn(
     x=test_data_generator(),
     batch_size=hparams.batch_size,
@@ -93,7 +90,7 @@ def main(_):
   def model_fn(features, labels, mode, params):
     """Model function for Estimator."""
     logits = models.create_model(
-      features['input_data'],
+      tf.cast(features['input_data'], tf.float32),
       model_settings,
       FLAGS.model_architecture,
       is_training=False)
@@ -101,7 +98,7 @@ def main(_):
     # Provide an estimator spec for `ModeKeys.PREDICT`.
     if mode == tf.estimator.ModeKeys.PREDICT:
       predictions = {
-        'fname': features['fname'],
+        'fname': tf.cast(features['fname'], tf.float32),
         'label': tf.argmax(logits, axis=-1)
       }
       specs = dict(
@@ -135,10 +132,10 @@ def main(_):
     # print("fname >>> : ", fname, ", ", "label >>> : ", label)
     submission[fname] = label
 
-  fin = open(os.path.join(model_dir, 'sample_submission.csv'), 'rb')
+  fin = open(os.path.join(FLAGS.train_dir, 'sample_submission.csv'), 'rb')
   reader = csv.reader(fin)
   headers = reader.next()
-  fout = open(os.path.join(model_dir, 'submission.csv'), 'wb')
+  fout = open(os.path.join(FLAGS.train_dir, 'submission.csv'), 'wb')
   writer = csv.writer(fout)
   writer.writerow(headers)
   for row in reader:
@@ -201,10 +198,16 @@ if __name__ == '__main__':
       default='yes,no,up,down,left,right,on,off,stop,go',
       help='Words to use (others will be added to an unknown label)',)
   parser.add_argument(
+    '--train_dir',
+    type=str,
+    default='./models/173704',
+    help='Directory to write event logs and checkpoint.')
+  parser.add_argument(
       '--model_architecture',
       type=str,
       default='mobile',
       help='What model architecture to use')
+
 
   FLAGS, unparsed = parser.parse_known_args()
   tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
