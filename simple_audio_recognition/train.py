@@ -357,7 +357,7 @@ def main(_):
     # Provide an estimator spec for `ModeKeys.PREDICT`.
     if mode == tf.estimator.ModeKeys.PREDICT:
       predictions = {
-        'fname': tf.cast(features['fname'], tf.float32),
+        'fname': features['fname'],
         'label': tf.argmax(logits, axis=-1)
       }
       specs = dict(
