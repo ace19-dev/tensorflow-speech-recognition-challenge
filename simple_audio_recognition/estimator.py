@@ -49,7 +49,7 @@ def main(_):
   )
 
   hparams = tf.contrib.training.HParams(**params)
-  model_dir = './models'  # folder for model, checkpoints, logs and submission.csv
+  model_dir = './model'  # folder for model, checkpoints, logs and submission.csv
   run_config = tf.contrib.learn.RunConfig()
   run_config = run_config.replace(model_dir=model_dir)
 

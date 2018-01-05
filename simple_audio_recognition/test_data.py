@@ -397,7 +397,7 @@ class AudioProcessor(object):
     else:
       sample_count = max(0, min(how_many, len(candidates) - offset))
     # Data and labels will be populated and returned.
-    data = np.zeros((sample_count, model_settings['fingerprint_size']), dtype=np.float32)
+    data = np.zeros((sample_count, model_settings['fingerprint_size']))
     # fname = np.zeros(sample_count, dtype=np.float32)
     desired_samples = model_settings['desired_samples']
     use_background = self.background_data and (mode == 'training')
