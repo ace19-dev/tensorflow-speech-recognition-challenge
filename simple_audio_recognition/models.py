@@ -23,6 +23,7 @@ import math
 
 import tensorflow as tf
 
+slim = tf.contrib.slim
 
 def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
                            window_size_ms, window_stride_ms,
