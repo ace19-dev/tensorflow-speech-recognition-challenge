@@ -154,10 +154,11 @@ def main(_):
     learning_rate_input = tf.placeholder(
         tf.float32, [], name='learning_rate_input')
     momentum = tf.placeholder(tf.float32, [], name='momentum')
-    # SGD
-    train_step = \
-      tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).\
-        minimize(cross_entropy_mean)
+    # optimizer
+    tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
+    # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    # train_step = tf.train.RMSPropOptimizer(learning_rate_input).minimize(cross_entropy_mean)
 
   predicted_indices = tf.argmax(logits, 1)
   expected_indices = tf.argmax(ground_truth_input, 1)
