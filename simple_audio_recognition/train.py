@@ -155,9 +155,9 @@ def main(_):
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
     # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
+    train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
     # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
+    # train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
 
   predicted_indices = tf.argmax(logits, 1)
   expected_indices = tf.argmax(ground_truth_input, 1)
@@ -314,15 +314,16 @@ def main(_):
     FLAGS.test_data_dir,
     model_settings
   )
-  print('testing data size: ', audio_processor2.set_size('testing'))
-  set_size = audio_processor2.set_size('testing')
+
+  set_size = audio_processor2.set_size('prediction')
+  print('prediction data size: ', set_size)
   def test_data_generator():
     def generator():
       for i in xrange(0, set_size, FLAGS.prediction_batch_size):
-        # Pull the audio samples we'll use for testing.
+        # Pull the audio samples we'll use for prediction.
         fname, fingerprints = \
           audio_processor2.get_data(FLAGS.prediction_batch_size, i, model_settings,
-                                    0.0, 0.0, 0, 'testing', sess)
+                                    0.0, 0.0, 0, 'prediction', sess)
 
         yield dict(
           fname=np.string_(fname),
@@ -331,14 +332,8 @@ def main(_):
 
     return generator
 
-  test_input_fn = generator_input_fn(
-    x=test_data_generator(),
-    batch_size=hparams.batch_size,
-    shuffle=False,
-    num_epochs=1,
-    queue_capacity=10 * hparams.batch_size,
-    num_threads=1
-  )
+  test_input_fn = generator_input_fn(x=test_data_generator(),
+                                     batch_size=hparams.batch_size)
 
   def model_fn(features, labels, mode, params):
     """Model function for Estimator."""
@@ -360,17 +355,15 @@ def main(_):
       )
     return tf.estimator.EstimatorSpec(**specs)
 
-  def get_estimator(config=None, hparams=None):
+  def get_estimator(config, hparams):
     """Return the model as a Tensorflow Estimator object.
     Args:
        run_config (RunConfig): Configuration for Estimator run.
        params (HParams): hyperparameters.
     """
-    return tf.estimator.Estimator(
-      model_fn=model_fn,
-      config=config,
-      params=hparams,
-    )
+    return tf.estimator.Estimator(model_fn=model_fn,
+                                  config=config,
+                                  params=hparams)
 
   estimator = get_estimator(config=run_config, hparams=hparams)
   it = estimator.predict(input_fn=test_input_fn)
@@ -380,7 +373,6 @@ def main(_):
   submission = dict()
   for t in tqdm(it):
     fname, label = t['fname'].decode(), id2name[t['label']]
-    # print("fname >>> : ", fname, ", ", "label >>> : ", label)
     submission[fname] = label
 
   # make submission.csv
@@ -415,7 +407,7 @@ if __name__ == '__main__':
     type=str,
     default='../../../dl_data/speech_commands/test/audio/',
     help="""\
-          Where is speech testing data.
+          Where is speech prediction data.
           """)
   parser.add_argument(
       '--background_volume',
