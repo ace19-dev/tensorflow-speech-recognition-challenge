@@ -73,7 +73,7 @@ import tensorflow as tf
 
 import input_data
 import models
-import test_data
+import prediction_data
 
 from tensorflow.python.platform import gfile
 from tensorflow.contrib.learn.python.learn.learn_io.generator_io import generator_input_fn
@@ -309,21 +309,21 @@ def main(_):
   run_config = tf.contrib.learn.RunConfig()
   run_config = run_config.replace(model_dir=FLAGS.train_dir)
 
-  audio_processor2 = test_data.AudioProcessor(
+  audio_processor2 = prediction_data.AudioProcessor(
     FLAGS.data_dir,
     FLAGS.test_data_dir,
     model_settings
   )
 
-  set_size = audio_processor2.set_size('prediction')
+  set_size = audio_processor2.set_size()
   print('prediction data size: ', set_size)
   def test_data_generator():
     def generator():
       for i in xrange(0, set_size, FLAGS.prediction_batch_size):
         # Pull the audio samples we'll use for prediction.
         fname, fingerprints = \
-          audio_processor2.get_data(FLAGS.prediction_batch_size, i, model_settings,
-                                    0.0, 0.0, 0, 'prediction', sess)
+          audio_processor2.get_data(FLAGS.prediction_batch_size, i,
+                                    model_settings, 0.0, 0.0, 0, sess)
 
         yield dict(
           fname=np.string_(fname),
@@ -412,7 +412,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.2,
+      default=0.3,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
@@ -492,7 +492,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.001,0.0001',
+      default='0.005,0.0005',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
