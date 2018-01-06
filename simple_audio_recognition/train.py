@@ -207,7 +207,8 @@ def main(_):
         learning_rate_value = learning_rates_list[i]
         break
     # Pull the audio samples we'll use for training.
-    train_fingerprints, train_ground_truth = audio_processor.get_data(
+    train_fingerprints, train_ground_truth = \
+      audio_processor.get_data(
         FLAGS.batch_size, 0, model_settings, FLAGS.background_frequency,
         FLAGS.background_volume, time_shift_samples, 'training', sess)
     # Run the graph with this batch of training data.
@@ -319,10 +320,9 @@ def main(_):
     def generator():
       for i in xrange(0, set_size, FLAGS.prediction_batch_size):
         # Pull the audio samples we'll use for testing.
-        fname, fingerprints = audio_processor2.get_data(
-          FLAGS.prediction_batch_size, i, model_settings,
-          FLAGS.background_frequency, FLAGS.background_volume,
-          FLAGS.time_shift_ms, 'testing', sess)
+        fname, fingerprints = \
+          audio_processor2.get_data(FLAGS.prediction_batch_size, i, model_settings,
+                                    0.0, 0.0, 0, 'testing', sess)
 
         yield dict(
           fname=np.string_(fname),
@@ -393,6 +393,7 @@ def main(_):
   fout.close()
 
 
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument(
@@ -433,14 +434,14 @@ if __name__ == '__main__':
   parser.add_argument(
       '--silence_percentage',
       type=float,
-      default=30.0,
+      default=10.0,
       help="""\
       How much of the training data should be silence.
       """)
   parser.add_argument(
       '--unknown_percentage',
       type=float,
-      default=30.0,
+      default=10.0,
       help="""\
       How much of the training data should be unknown words.
       """)
@@ -454,7 +455,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--testing_percentage',
       type=int,
-      default=15,
+      default=10,
       help='What percentage of wavs to use as a test set.')
   parser.add_argument(
       '--validation_percentage',
@@ -494,12 +495,12 @@ if __name__ == '__main__':
   parser.add_argument(
       '--eval_step_interval',
       type=int,
-      default=1000,
+      default=500,
       help='How often to evaluate the training results.')
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.001,0.0005',
+      default='0.001,0.0001',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
