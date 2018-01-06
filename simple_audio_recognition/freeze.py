@@ -145,7 +145,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--window_stride_ms',
       type=float,
-      default=10.0,
+      default=15.0,
       help='How long the stride is between spectrogram timeslices',)
   parser.add_argument(
       '--dct_coefficient_count',

@@ -21,7 +21,10 @@
 
 ### Evaluation
 - Submissions are evaluated on Multiclass Accuracy, which is simply the average number of observations with the correct label.
+  - There are only 12 possible labels for the Test set: yes, no, up, down, left, right, on, off, stop, go, silence, unknown.
+  - The unknown label should be used for a command that is not one one of the first 10 labels or that is not silence.
 - For audio clip in the test set, you must predict the correct label
+- The submission file should contain a header and have the following format:
 
 
 ### Prerequisite
