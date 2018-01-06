@@ -440,7 +440,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--time_shift_ms',
       type=float,
-      default=100.0,
+      default=150.0,
       help="""\
       Range to randomly shift the training audio by in time.
       """)
