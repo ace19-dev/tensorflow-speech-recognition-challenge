@@ -489,7 +489,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='5000',
+      default='2000,3000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -499,7 +499,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.003',
+      default='0.001,0.0005',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
