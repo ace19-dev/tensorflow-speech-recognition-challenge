@@ -151,14 +151,13 @@ def main(_):
   tf.summary.scalar('cross_entropy', cross_entropy_mean)
 
   with tf.name_scope('train'), tf.control_dependencies(control_dependencies):
-    learning_rate_input = tf.placeholder(
-        tf.float32, [], name='learning_rate_input')
+    learning_rate_input = tf.placeholder(tf.float32, [], name='learning_rate_input')
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
-    train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
     # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
     # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    # train_step = tf.train.RMSPropOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
 
   predicted_indices = tf.argmax(logits, 1)
   expected_indices = tf.argmax(ground_truth_input, 1)
@@ -221,7 +220,7 @@ def main(_):
             fingerprint_input: train_fingerprints,
             ground_truth_input: train_ground_truth,
             learning_rate_input: learning_rate_value,
-            momentum:0.95,
+            momentum:0.9,
             dropout_prob: 0.5
         })
     train_writer.add_summary(train_summary, training_step)
@@ -295,41 +294,35 @@ def main(_):
 
   # for prediction
   tf.logging.info('Lets prediction >>> \n')
-  POSSIBLE_LABELS = 'yes no up down left right on off stop go silence unknown'.split()
+  POSSIBLE_LABELS = 'yes,no,up,down,left,right,on,off,stop,go,silence,unknown'.split(',')
   params = dict(
-    seed=2018,
     batch_size=FLAGS.prediction_batch_size,
     keep_prob=0.5,
-    learning_rate=0.0002,
+    learning_rate=0.003,
     clip_gradients=15.0,
     use_batch_norm=True,
     num_classes=len(POSSIBLE_LABELS)
   )
 
   hparams = tf.contrib.training.HParams(**params)
-  # model_dir = './models'  # folder for model, checkpoints, logs and submission.csv
   run_config = tf.contrib.learn.RunConfig()
   run_config = run_config.replace(model_dir=FLAGS.train_dir)
 
   audio_processor2 = test_data.AudioProcessor(
     FLAGS.data_dir,
     FLAGS.test_data_dir,
-    # FLAGS.silence_percentage,
-    # FLAGS.unknown_percentage,
-    FLAGS.wanted_words.split(','),
     model_settings
-    # FLAGS.validation_percentage,
-    # FLAGS.testing_percentage,
   )
   print('testing data size: ', audio_processor2.set_size('testing'))
   set_size = audio_processor2.set_size('testing')
-
   def test_data_generator():
     def generator():
       for i in xrange(0, set_size, FLAGS.prediction_batch_size):
         # Pull the audio samples we'll use for testing.
         fname, fingerprints = audio_processor2.get_data(
-          FLAGS.prediction_batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
+          FLAGS.prediction_batch_size, i, model_settings,
+          FLAGS.background_frequency, FLAGS.background_volume,
+          FLAGS.time_shift_ms, 'testing', sess)
 
         yield dict(
           fname=np.string_(fname),
@@ -390,23 +383,13 @@ def main(_):
     # print("fname >>> : ", fname, ", ", "label >>> : ", label)
     submission[fname] = label
 
-  # memory dump
-  fout = open(os.path.join(FLAGS.result_dir, 'memory_dump.csv'), 'w', encoding='utf-8', newline='')
+  # make submission.csv
+  fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'w', encoding='utf-8', newline='')
   writer = csv.writer(fout)
+  writer.writerow(['fname', 'label'])
   for key in sorted(submission.keys()):
     # print("%s: %s" % (key, submission[key]))
     writer.writerow([key, submission[key]])
-  fout.close()
-
-  fin = open(os.path.join(FLAGS.result_dir, 'sample_submission.csv'), 'r', encoding='utf-8')
-  reader = csv.reader(fin)
-  fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'w', encoding='utf-8', newline='')
-  writer = csv.writer(fout)
-  for row in reader:
-    if row[0] != 'fname':
-      row[1] = submission[row[0]]
-    writer.writerow(row)
-  fin.close()
   fout.close()
 
 
@@ -436,28 +419,28 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.3,
+      default=0.2,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
   parser.add_argument(
       '--background_frequency',
       type=float,
-      default=0.9,
+      default=0.8,
       help="""\
       How many of the training samples have background noise mixed in.
       """)
   parser.add_argument(
       '--silence_percentage',
       type=float,
-      default=10.0,
+      default=30.0,
       help="""\
       How much of the training data should be silence.
       """)
   parser.add_argument(
       '--unknown_percentage',
       type=float,
-      default=10.0,
+      default=30.0,
       help="""\
       How much of the training data should be unknown words.
       """)
@@ -491,7 +474,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--window_size_ms',
       type=float,
-      default=20.0,
+      default=30.0,
       help='How long each spectrogram timeslice is',)
   parser.add_argument(
       '--window_stride_ms',
@@ -506,7 +489,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='5000,3000,2000',
+      default='5000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -516,7 +499,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.05,0.005,0.0001',
+      default='0.003',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',

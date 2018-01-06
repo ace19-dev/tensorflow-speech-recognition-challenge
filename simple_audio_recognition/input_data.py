@@ -294,8 +294,7 @@ class AudioProcessor(object):
       wav_filename_placeholder = tf.placeholder(tf.string, [])
       wav_loader = io_ops.read_file(wav_filename_placeholder)
       wav_decoder = contrib_audio.decode_wav(wav_loader, desired_channels=1)
-      search_path = os.path.join(self.data_dir, BACKGROUND_NOISE_DIR_NAME,
-                                 '*.wav')
+      search_path = os.path.join(self.data_dir, BACKGROUND_NOISE_DIR_NAME, '*.wav')
       for wav_path in gfile.Glob(search_path):
         wav_data = sess.run(
             wav_decoder,
