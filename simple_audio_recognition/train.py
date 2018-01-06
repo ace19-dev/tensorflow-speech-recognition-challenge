@@ -389,21 +389,22 @@ def main(_):
     # print("fname >>> : ", fname, ", ", "label >>> : ", label)
     submission[fname] = label
 
+  # memory dump
+  fout = open(os.path.join(FLAGS.result_dir, 'memory_dump.csv'), 'w', encoding='utf-8', newline='')
+  writer = csv.writer(fout)
+  for key in sorted(submission.keys()):
+    # print("%s: %s" % (key, submission[key]))
+    writer.writerow([key, submission[key]])
+  fout.close()
+
   fin = open(os.path.join(FLAGS.result_dir, 'sample_submission.csv'), 'r', encoding='utf-8')
   reader = csv.reader(fin)
-
-  # fin = open(os.path.join(FLAGS.result_dir, 'sample_submission.csv'), 'rb')
-  # reader = csv.reader(fin)
-  # headers = reader.next()
   fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'w', encoding='utf-8', newline='')
-  # fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'wb')
   writer = csv.writer(fout)
-  # writer.writerow(headers)
   for row in reader:
     if row[0] != 'fname':
       row[1] = submission[row[0]]
     writer.writerow(row)
-
   fin.close()
   fout.close()
 
@@ -434,7 +435,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.2,
+      default=0.3,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
@@ -489,7 +490,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--window_size_ms',
       type=float,
-      default=30.0,
+      default=20.0,
       help='How long each spectrogram timeslice is',)
   parser.add_argument(
       '--window_stride_ms',
@@ -504,7 +505,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='2000,3000',
+      default='100',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -514,7 +515,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.005,0.001',
+      default='0.002',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
