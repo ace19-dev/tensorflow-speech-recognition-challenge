@@ -36,13 +36,7 @@ from tensorflow.python.ops import io_ops
 from tensorflow.python.platform import gfile
 from tensorflow.python.util import compat
 
-# MAX_NUM_WAVS_PER_CLASS = 2**27 - 1  # ~134M
-# SILENCE_LABEL = '_silence_'
-SILENCE_INDEX = 0
-# UNKNOWN_WORD_LABEL = '_unknown_'
-UNKNOWN_WORD_INDEX = 1
 BACKGROUND_NOISE_DIR_NAME = '_background_noise_'
-
 RANDOM_SEED = 59185
 
 
@@ -60,13 +54,13 @@ class AudioProcessor(object):
   def prepare_data_index(self):
     random.seed(RANDOM_SEED)
 
-    self.data_index = {'testing': []}
+    self.data_index = {'prediction': []}
     # Look through all the subfolders to find audio samples
     search_path = os.path.join(self.test_data_dir, '*.wav')
     for wav_path in gfile.Glob(search_path):
-      self.data_index['testing'].append({'file': wav_path})
+      self.data_index['prediction'].append({'file': wav_path})
 
-    random.shuffle(self.data_index['testing'])
+    random.shuffle(self.data_index['prediction'])
 
   def prepare_background_data(self):
     """Searches a folder for background noise audio, and loads it into memory.
@@ -155,17 +149,15 @@ class AudioProcessor(object):
         wav_decoder.sample_rate,
         dct_coefficient_count=model_settings['dct_coefficient_count'])
 
-  def set_size(self, mode):
+  def set_size(self):
     """Calculates the number of samples in the dataset partition.
-    Args:
-      mode: Which partition, must be 'training', 'validation', or 'testing'.
     Returns:
       Number of samples in the partition.
     """
-    return len(self.data_index[mode])
+    return len(self.data_index['prediction'])
 
   def get_data(self, how_many, offset, model_settings, background_frequency,
-               background_volume_range, time_shift, mode, sess):
+               background_volume_range, time_shift, sess):
     """Gather samples from the data set, applying transformations as needed.
     When the mode is 'training', a random selection of samples will be returned,
     otherwise the first N clips in the partition will be used. This ensures that
@@ -179,15 +171,13 @@ class AudioProcessor(object):
         1.0.
       background_volume_range: How loud the background noise will be.
       time_shift: How much to randomly shift the clips by in time.
-      mode: Which partition to use, must be 'training', 'validation', or
-        'testing'.
       sess: TensorFlow session that was active when processor was created.
     Returns:
       List of sample data for the transformed samples, and list of labels in
       one-hot form.
     """
     # Pick one of the partitions to choose samples from.
-    candidates = self.data_index[mode]
+    candidates = self.data_index['prediction']
     if how_many == -1:
       sample_count = len(candidates)
     else:
@@ -195,8 +185,8 @@ class AudioProcessor(object):
     # Data will be populated and returned.
     data = np.zeros((sample_count, model_settings['fingerprint_size']))
     desired_samples = model_settings['desired_samples']
-    use_background = self.background_data and (mode == 'training')
-    pick_deterministically = (mode != 'training')
+    use_background = self.background_data and False
+    pick_deterministically = True
     # Use the processing graph we created earlier to repeatedly to generate the
     # final output sample data we'll use in training.
     for i in xrange(offset, offset + sample_count):
@@ -249,18 +239,16 @@ class AudioProcessor(object):
     return fname, data
 
 
-  def get_unprocessed_data(self, how_many, model_settings, mode):
+  def get_unprocessed_data(self, how_many, model_settings):
     """Retrieve sample data for the given partition, with no transformations.
     Args:
       how_many: Desired number of samples to return. -1 means the entire
         contents of this partition.
       model_settings: Information about the current model being trained.
-      mode: Which partition to use, must be 'training', 'validation', or
-        'testing'.
     Returns:
       List of sample data for the samples, and list of labels in one-hot form.
     """
-    candidates = self.data_index[mode]
+    candidates = self.data_index['prediction']
     if how_many == -1:
       sample_count = len(candidates)
     else:
@@ -284,10 +272,7 @@ class AudioProcessor(object):
           sample_index = np.random.randint(len(candidates))
         sample = candidates[sample_index]
         input_dict = {wav_filename_placeholder: sample['file']}
-        if sample['label'] == SILENCE_LABEL:
-          input_dict[foreground_volume_placeholder] = 0
-        else:
-          input_dict[foreground_volume_placeholder] = 1
+        input_dict[foreground_volume_placeholder] = 1
         data[i, :] = sess.run(scaled_foreground, feed_dict=input_dict).flatten()
         label_index = self.word_to_index[sample['label']]
         labels.append(words_list[label_index])
