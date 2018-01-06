@@ -155,7 +155,7 @@ def main(_):
         tf.float32, [], name='learning_rate_input')
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
-    tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
     # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
     # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
     # train_step = tf.train.RMSPropOptimizer(learning_rate_input).minimize(cross_entropy_mean)
