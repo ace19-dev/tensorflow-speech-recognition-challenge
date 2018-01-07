@@ -62,7 +62,6 @@ from __future__ import print_function
 import argparse
 import os.path
 import sys
-import time
 import csv
 
 from tqdm import tqdm
@@ -295,7 +294,7 @@ def main(_):
 
   # for prediction
   tf.logging.info('Lets prediction >>> \n')
-  POSSIBLE_LABELS = 'yes,no,up,down,left,right,on,off,stop,go,silence,unknown'.split(',')
+  POSSIBLE_LABELS = 'silence,unknown,yes,no,up,down,left,right,on,off,stop,go'.split(',')
   params = dict(
     batch_size=FLAGS.prediction_batch_size,
     keep_prob=0.5,
@@ -440,7 +439,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--time_shift_ms',
       type=float,
-      default=150.0,
+      default=100.0,
       help="""\
       Range to randomly shift the training audio by in time.
       """)
