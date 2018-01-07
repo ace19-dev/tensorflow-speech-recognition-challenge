@@ -301,7 +301,7 @@ def main(_):
                                  fingerprint_input: fingerprints,
                                  dropout_prob: 1.0
                                })
-    # print(fname[0].decode('UTF8'), prediction[0][0])
+    print("count: ", i)
     submission[fname[0].decode('UTF8')] = id2name[prediction[0][0]]
 
   # make submission.csv
