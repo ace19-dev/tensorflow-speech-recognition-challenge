@@ -301,7 +301,7 @@ def main(_):
                                  fingerprint_input: fingerprints,
                                  dropout_prob: 1.0
                                })
-    print("count: ", i)
+    print("num:", i)
     submission[fname[0].decode('UTF8')] = id2name[prediction[0][0]]
 
   # make submission.csv
@@ -410,8 +410,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      # default='9000,3000',
-      default='50,50',
+      default='9000,3000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
