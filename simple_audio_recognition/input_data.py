@@ -37,9 +37,9 @@ from tensorflow.python.platform import gfile
 from tensorflow.python.util import compat
 
 MAX_NUM_WAVS_PER_CLASS = 2**27 - 1  # ~134M
-SILENCE_LABEL = 'silence'
+SILENCE_LABEL = '_silence_'
 SILENCE_INDEX = 0
-UNKNOWN_WORD_LABEL = 'unknown'
+UNKNOWN_WORD_LABEL = '_unknown_'
 UNKNOWN_WORD_INDEX = 1
 BACKGROUND_NOISE_DIR_NAME = '_background_noise_'
 RANDOM_SEED = 59185
@@ -145,7 +145,7 @@ class AudioProcessor(object):
                wanted_words, validation_percentage, testing_percentage,
                model_settings):
     self.data_dir = data_dir
-    self.maybe_download_and_extract_dataset(data_url, data_dir)
+    # self.maybe_download_and_extract_dataset(data_url, data_dir)
     self.prepare_data_index(silence_percentage, unknown_percentage,
                             wanted_words, validation_percentage,
                             testing_percentage)
