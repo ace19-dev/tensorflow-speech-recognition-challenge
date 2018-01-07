@@ -118,7 +118,6 @@ def main(_):
 
   fingerprint_input = tf.placeholder(
       tf.float32, [None, fingerprint_size], name='fingerprint_input')
-
   logits, dropout_prob = models.create_model(
       fingerprint_input,
       model_settings,
@@ -145,8 +144,11 @@ def main(_):
     learning_rate_input = tf.placeholder(
         tf.float32, [], name='learning_rate_input')
     momentum = tf.placeholder(tf.float32, [], name='momentum')
-    train_step = tf.train.MomentumOptimizer(
-      learning_rate_input, momentum).minimize(cross_entropy_mean)
+    # optimizer
+    # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
+    # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
   correct_prediction = tf.equal(predicted_indices, ground_truth_input)
   confusion_matrix = tf.confusion_matrix(
@@ -168,7 +170,6 @@ def main(_):
   tf.global_variables_initializer().run()
 
   start_step = 1
-
   if FLAGS.start_checkpoint:
     models.load_variables_from_checkpoint(sess, FLAGS.start_checkpoint)
     start_step = global_step.eval(session=sess)
@@ -347,7 +348,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_frequency',
       type=float,
-      default=0.8,
+      default=0.9,
       help="""\
       How many of the training samples have background noise mixed in.
       """)
@@ -415,7 +416,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--eval_step_interval',
       type=int,
-      default=500,
+      default=1000,
       help='How often to evaluate the training results.')
   parser.add_argument(
       '--learning_rate',
