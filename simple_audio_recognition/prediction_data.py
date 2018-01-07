@@ -184,6 +184,7 @@ class AudioProcessor(object):
       sample_count = max(0, min(how_many, len(candidates) - offset))
     # Data will be populated and returned.
     data = np.zeros((sample_count, model_settings['fingerprint_size']))
+    fname = np.empty(sample_count, dtype="S20")
     desired_samples = model_settings['desired_samples']
     use_background = self.background_data and False
     pick_deterministically = True
@@ -196,7 +197,6 @@ class AudioProcessor(object):
       else:
         sample_index = np.random.randint(len(candidates))
       sample = candidates[sample_index]
-      fname = os.path.basename(sample['file'])
 
       # If we're time shifting, set up the offset for this sample.
       if time_shift > 0:
@@ -233,6 +233,8 @@ class AudioProcessor(object):
       input_dict[self.background_data_placeholder_] = background_reshaped
       input_dict[self.background_volume_placeholder_] = background_volume
       input_dict[self.foreground_volume_placeholder_] = 1
+
+      fname[i - offset] = os.path.basename(sample['file'])
       # Run the graph to produce the output audio.
       data[i - offset, :] = sess.run(self.mfcc_, feed_dict=input_dict).flatten()
 
