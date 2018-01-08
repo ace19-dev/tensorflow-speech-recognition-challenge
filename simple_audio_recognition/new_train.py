@@ -146,9 +146,9 @@ def main(_):
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
     # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
+    train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
     # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
+    # train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
   correct_prediction = tf.equal(predicted_indices, ground_truth_input)
   confusion_matrix = tf.confusion_matrix(
@@ -211,7 +211,7 @@ def main(_):
             fingerprint_input: train_fingerprints,
             ground_truth_input: train_ground_truth,
             learning_rate_input: learning_rate_value,
-            momentum: 0.9,
+            momentum: 0.95,
             dropout_prob: 0.5
         })
     train_writer.add_summary(train_summary, training_step)
@@ -302,8 +302,10 @@ def main(_):
                                  fingerprint_input: fingerprints,
                                  dropout_prob: 1.0
                                })
-    print(i)
-    submission[fname[0].decode('UTF8')] = id2name[prediction[0][0]]
+    size = len(fname)
+    for n in xrange(0, size):
+      submission[fname[n].decode('UTF8')] = id2name[prediction[0][n]]
+    print(i+size)
 
   # make submission.csv
   fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'w', encoding='utf-8', newline='')
@@ -411,7 +413,8 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='9000,3000',
+      # default='9000,3000',
+      default='50,50',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -466,7 +469,7 @@ if __name__ == '__main__':
   parser.add_argument(
     '--prediction_batch_size',
     type=int,
-    default=1,
+    default=5000,
     help='How many items to predict with at once', )
   parser.add_argument(
       '--check_nans',
