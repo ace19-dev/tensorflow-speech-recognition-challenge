@@ -65,7 +65,9 @@
   - each spectrogram png size change to same size
   - data augmentation
  
-
+## Quick Start
+- It's simple. 
+  - python new_train.py
 
 ## Additional work 
 ### After reaching a satisfactory level, we would try other resolutions
