@@ -212,7 +212,7 @@ def main(_):
             ground_truth_input: train_ground_truth,
             learning_rate_input: learning_rate_value,
             momentum: 0.95,
-            dropout_prob: 0.3
+            dropout_prob: 0.5
         })
     train_writer.add_summary(train_summary, training_step)
     tf.logging.info('Step #%d: rate %f, accuracy %.1f%%, cross entropy %f' %
@@ -314,7 +314,6 @@ def main(_):
   for key in sorted(submission.keys()):
     writer.writerow([key, submission[key]])
   fout.close()
-
 
 
 if __name__ == '__main__':
