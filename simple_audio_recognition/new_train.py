@@ -302,7 +302,7 @@ def main(_):
                                  fingerprint_input: fingerprints,
                                  dropout_prob: 1.0
                                })
-    print("num:", i)
+    print(i)
     submission[fname[0].decode('UTF8')] = id2name[prediction[0][0]]
 
   # make submission.csv
@@ -348,7 +348,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_frequency',
       type=float,
-      default=0.9,
+      default=0.8,
       help="""\
       How many of the training samples have background noise mixed in.
       """)
