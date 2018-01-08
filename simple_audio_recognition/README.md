@@ -23,7 +23,7 @@
 - you can also supply your own training data
 - <b>If you have clips with variable amounts of silence at the start, you can look at word alignment tools to standardize them</b>
   - https://petewarden.com/2017/07/17/a-quick-hack-to-align-single-word-audio-recordings/
-- Image augmentation and audio augmentation.
+- <b>Image augmentation and audio augmentation.</b>
 - Add Background Noise
   - add background noise (helps add some realism to the training)
   - you can supply your own audio clips in the _background_noise_ folder
