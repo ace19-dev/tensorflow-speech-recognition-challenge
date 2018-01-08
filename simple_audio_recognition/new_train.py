@@ -69,9 +69,9 @@ import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
-import new_input_data
 import models
-import prediction_data
+import new_input_data
+import prediction_input_data
 from tensorflow.python.platform import gfile
 from tensorflow.contrib.learn.python.learn.learn_io.generator_io import generator_input_fn
 
@@ -212,7 +212,7 @@ def main(_):
             ground_truth_input: train_ground_truth,
             learning_rate_input: learning_rate_value,
             momentum: 0.95,
-            dropout_prob: 0.5
+            dropout_prob: 0.3
         })
     train_writer.add_summary(train_summary, training_step)
     tf.logging.info('Step #%d: rate %f, accuracy %.1f%%, cross entropy %f' %
@@ -281,13 +281,13 @@ def main(_):
 
 
   # for prediction
-  POSSIBLE_LABELS = 'silence,unknown,yes,no,up,down,left,right,on,off,stop,go'.split(',')
+  POSSIBLE_LABELS = new_input_data.prepare_words_list(FLAGS.wanted_words.split(','))
   id2name = {i: name for i, name in enumerate(POSSIBLE_LABELS)}
   submission = dict()
 
-  audio_processor2 = prediction_data.AudioProcessor(
+  audio_processor2 = prediction_input_data.AudioProcessor(
       FLAGS.data_dir,
-      FLAGS.test_data_dir,
+      FLAGS.prediction_data_dir,
       model_settings
     )
   set_size = audio_processor2.set_size()
@@ -334,7 +334,7 @@ if __name__ == '__main__':
       Where to download the speech training data to.
       """)
   parser.add_argument(
-    '--test_data_dir',
+    '--prediction_data_dir',
     type=str,
     default='../../../dl_data/speech_commands/test/audio/',
     help="""\
@@ -343,7 +343,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.3,
+      default=0.2,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
@@ -413,8 +413,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      # default='9000,3000',
-      default='50,50',
+      default='9000,3000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -424,7 +423,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.001,0.0001',
+      default='0.005,0.001',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
@@ -464,7 +463,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='mobile',
+      default='squeeze',
       help='What model architecture to use')
   parser.add_argument(
     '--prediction_batch_size',
