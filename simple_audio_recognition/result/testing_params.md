@@ -7,8 +7,8 @@
 |  4  | joongjum| squeeze |  91.3%    |  91.0%   |   80 %    | 7000,5000  | 0.001,0.0001    | 100   | RMSProp    | Relu       | 10       |   30     | 100       |  16000      |  0.1    |  0.8     |   40    |   speech_dataset      |    audio    |
 |  5  | Sean    | squeeze |  91.3%    |  92.4%   |   79%    | 9000,3000  | 0.001,0.0001    | 100   | Adam       | Relu       | 10       |   30     | 100       |  16000      |  0.1    |  0.7     |   40    |   speech_dataset      |    audio    |
 |  6  | Sean    | squeeze |  91.6%    |  91.1%   |   80%    | 9000,4000  | 0.001,0.0001    | 100   | Adam       | Relu       | 10       |   30     | 100       |  16000      |  0.3    |  0.9     |   40    |   speech_dataset      |    audio    |
-|  7  | ziippy  | conv    |  86.8% |   89.1% |     72%     |   9000,3000  | 0.001,0.0001    | 100   | RMSProp   |  Relu      | 10       |   30     |  0        |  16000      |  0.1    |  0.8     |   40      |   speech_dataset_1200      |    audio_1200    |
-|  8  | ziippy  | conv    |  85.5% |   84.7% |     00%     |   9000,3000  | 0.001,0.0001    | 100   | RMSProp   |  Relu      | 10       |   30     |  0        |  16000      |  0.1    |  0.8     |   40      |   speech_dataset_shift     |    audio     |
+|  7  | ziippy  | conv    |  86.8%  |  89.1%  |     72%     |   9000,3000  | 0.001,0.0001    | 100   | RMSProp   |  Relu      | 10       |   30     |  0        |  16000      |  0.1    |  0.8     |   40      |   speech_dataset_1200      |    audio_1200    |
+|  8  | ziippy  | conv    |  85.5%  |  84.7%  |     00%     |  9000,3000  | 0.001,0.0001    | 100   | RMSProp   |  Relu      | 10       |   30     |  0        |  16000      |  0.1    |  0.8     |   40      |   speech_dataset_shift     |    audio     |
 |  9  |         |         |           |          |          |            |                 |       |            |            |          |          |           |  16000      |         |          |         |         |        |
 
 
