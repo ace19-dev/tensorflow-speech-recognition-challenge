@@ -69,9 +69,9 @@ import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
-import new_input_data
 import models
-import prediction_data
+import new_input_data
+import prediction_input_data
 from tensorflow.python.platform import gfile
 from tensorflow.contrib.learn.python.learn.learn_io.generator_io import generator_input_fn
 
@@ -146,9 +146,9 @@ def main(_):
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
     # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
+    train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
     # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
+    # train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
   correct_prediction = tf.equal(predicted_indices, ground_truth_input)
   confusion_matrix = tf.confusion_matrix(
@@ -211,7 +211,7 @@ def main(_):
             fingerprint_input: train_fingerprints,
             ground_truth_input: train_ground_truth,
             learning_rate_input: learning_rate_value,
-            momentum: 0.9,
+            momentum: 0.95,
             dropout_prob: 0.5
         })
     train_writer.add_summary(train_summary, training_step)
@@ -281,13 +281,13 @@ def main(_):
 
 
   # for prediction
-  POSSIBLE_LABELS = 'silence,unknown,yes,no,up,down,left,right,on,off,stop,go'.split(',')
+  POSSIBLE_LABELS = new_input_data.prepare_words_list(FLAGS.wanted_words.split(','))
   id2name = {i: name for i, name in enumerate(POSSIBLE_LABELS)}
   submission = dict()
 
-  audio_processor2 = prediction_data.AudioProcessor(
+  audio_processor2 = prediction_input_data.AudioProcessor(
       FLAGS.data_dir,
-      FLAGS.test_data_dir,
+      FLAGS.prediction_data_dir,
       model_settings
     )
   set_size = audio_processor2.set_size()
@@ -302,8 +302,10 @@ def main(_):
                                  fingerprint_input: fingerprints,
                                  dropout_prob: 1.0
                                })
-    print("num:", i)
-    submission[fname[0].decode('UTF8')] = id2name[prediction[0][0]]
+    size = len(fname)
+    for n in xrange(0, size):
+      submission[fname[n].decode('UTF8')] = id2name[prediction[0][n]]
+    print(i+size)
 
   # make submission.csv
   fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'w', encoding='utf-8', newline='')
@@ -312,7 +314,6 @@ def main(_):
   for key in sorted(submission.keys()):
     writer.writerow([key, submission[key]])
   fout.close()
-
 
 
 if __name__ == '__main__':
@@ -332,7 +333,7 @@ if __name__ == '__main__':
       Where to download the speech training data to.
       """)
   parser.add_argument(
-    '--test_data_dir',
+    '--prediction_data_dir',
     type=str,
     default='../../../dl_data/speech_commands/test/audio/',
     help="""\
@@ -341,14 +342,14 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.3,
+      default=0.2,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
   parser.add_argument(
       '--background_frequency',
       type=float,
-      default=0.9,
+      default=0.8,
       help="""\
       How many of the training samples have background noise mixed in.
       """)
@@ -421,7 +422,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.001,0.0001',
+      default='0.005,0.001',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
@@ -461,12 +462,12 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='mobile',
+      default='squeeze',
       help='What model architecture to use')
   parser.add_argument(
     '--prediction_batch_size',
     type=int,
-    default=1,
+    default=5000,
     help='How many items to predict with at once', )
   parser.add_argument(
       '--check_nans',
