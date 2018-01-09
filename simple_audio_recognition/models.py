@@ -783,14 +783,17 @@ def create_low_latency_squeeze_model(fingerprint_input, model_settings, is_train
     input_time_size = model_settings['spectrogram_length']
     fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size, input_frequency_size, 1])
     print('fingerprint_4d : ', fingerprint_4d)
-    first_filter_width = 2
-    first_filter_height = 2
+
+    modify_fingerprint_4d = tf.image.resize_bilinear(fingerprint_4d,[224,224])
+    print('fingerprint_4d : ', modify_fingerprint_4d)
+    first_filter_width = 7
+    first_filter_height = 7
     first_filter_count = 64
     first_weights = tf.get_variable("first_weight", shape=[first_filter_height, first_filter_width, 1, first_filter_count],
                                     initializer=tf.contrib.layers.xavier_initializer())
 
     # conv1_1
-    first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 2, 2, 1], 'SAME')
+    first_conv = tf.nn.conv2d(modify_fingerprint_4d, first_weights, [1, 2, 2, 1], 'SAME')
     print('first_conv : ', first_conv)
     relu1 = tf.nn.relu(first_conv + bias_variable([64]))
     pool1 = tf.nn.max_pool(relu1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
@@ -805,26 +808,26 @@ def create_low_latency_squeeze_model(fingerprint_input, model_settings, is_train
     print('fire4 : ', fire4)
     fire5 = fire_module('fire5', fire4, squeeze_ratio * 32, 128, 128, True)
     print('fire5 : ', fire5)
-    #pool5 = tf.nn.max_pool(fire5, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='VALID')
+    pool5 = tf.nn.max_pool(fire5, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='VALID')
 
-    #fire6 = fire_module('fire6', pool5, squeeze_ratio * 48, 192, 192)
+    fire6 = fire_module('fire6', pool5, squeeze_ratio * 48, 192, 192)
 
-    #fire7 = fire_module('fire7', fire6, squeeze_ratio * 48, 192, 192, True)
+    fire7 = fire_module('fire7', fire6, squeeze_ratio * 48, 192, 192, True)
 
-    #fire8 = fire_module('fire8', fire7, squeeze_ratio * 64, 256, 256)
+    fire8 = fire_module('fire8', fire7, squeeze_ratio * 64, 256, 256)
 
-    #fire9 = fire_module('fire9', fire8, squeeze_ratio * 64, 256, 256, True)
+    fire9 = fire_module('fire9', fire8, squeeze_ratio * 64, 256, 256, True)
 
     # 50% dropout
-    dropout9 = tf.nn.dropout(fire5, dropout_prob)
+    dropout9 = tf.nn.dropout(fire9, dropout_prob)
     print('dropout9 : ', dropout9)
-    second_weights = tf.Variable(tf.random_normal([1, 1, 256, 1000], stddev=0.01), name="second_weight")
-    second_conv = tf.nn.conv2d(dropout9, second_weights, [1, 2, 2, 1], 'SAME')
+    second_weights = tf.Variable(tf.random_normal([1, 1, 512, 1000], stddev=0.01), name="second_weight")
+    second_conv = tf.nn.conv2d(dropout9, second_weights, [1, 1, 1, 1], 'SAME')
     print('second_conv : ', second_conv)
     relu10 = tf.nn.relu(second_conv + bias_variable([1000]))
     print('relu10 : ', relu10)
     # avg pool
-    pool10 = tf.nn.avg_pool(relu10, ksize=[1, 3, 3, 1], strides=[1, 1, 1, 1], padding='VALID')
+    pool10 = tf.nn.avg_pool(relu10, ksize=[1, 13, 13, 1], strides=[1, 1, 1, 1], padding='VALID')
     print('pool10 : ', pool10)
     last_conv_shape = pool10.get_shape()
     last_conv_ouput_width = last_conv_shape[2]
