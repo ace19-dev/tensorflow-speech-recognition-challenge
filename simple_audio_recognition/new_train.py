@@ -472,7 +472,7 @@ if __name__ == '__main__':
   parser.add_argument(
     '--prediction_batch_size',
     type=int,
-    default=5000,
+    default=2000,
     help='How many items to predict with at once', )
   parser.add_argument(
       '--check_nans',
