@@ -23,6 +23,8 @@ import math
 
 import tensorflow as tf
 
+import mobilenet
+
 slim = tf.contrib.slim
 
 def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
@@ -103,6 +105,8 @@ def create_model(fingerprint_input, model_settings, model_architecture,
     return create_conv_model(fingerprint_input, model_settings, is_training)
   elif model_architecture == 'mobile':
     return create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_training)
+  elif model_architecture == 'mobile2':
+    return create_mobilenet_model(fingerprint_input, model_settings, is_training)
   elif model_architecture == 'low_latency_conv':
     return create_low_latency_conv_model(fingerprint_input, model_settings,
                                          is_training)
@@ -720,6 +724,19 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
     return final_fc, dropout_prob
   else:
     return final_fc
+
+
+def create_mobilenet_model(fingerprint_input, model_settings, is_training):
+  dropout_prob = tf.placeholder(tf.float32, name='dropout_prob')
+  input_frequency_size = model_settings['dct_coefficient_count']
+  input_time_size = model_settings['spectrogram_length']
+  fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size,
+                                                  input_frequency_size, 1])
+  modify_fingerprint_4d = tf.image.resize_bilinear(fingerprint_4d, [224, 224])
+
+  logits, end_points = mobilenet.mobilenet(modify_fingerprint_4d, model_settings['label_count'])
+  return logits, dropout_prob
+
 
 def create_low_latency_conv_model(fingerprint_input, model_settings,
                                   is_training):

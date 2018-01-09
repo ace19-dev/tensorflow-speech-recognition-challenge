@@ -412,7 +412,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='9000,3000',
+      default='10000,5000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -422,7 +422,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.005,0.001',
+      default='0.005,0.005',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
@@ -462,7 +462,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='squeeze',
+      default='mobile2',
       help='What model architecture to use')
   parser.add_argument(
     '--prediction_batch_size',
