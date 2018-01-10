@@ -12,7 +12,7 @@
 |  9  | joongjum| squeeze |  94.2%   |  95.5%   |   82 %    | 8000,4000  | 0.001,0.0001    | 100   | RMSProp    |  10       |   30     | 100       |  16000      |  0.1    |  0.8    |   40    |   speech_dataset         |    audio    |
 |  10 | joongjum| squeeze |  92.3%   |  92.7%   |   82 %    | 9000,6000  | 0.001,0.0001    | 100   | Momentum    |  10       |   30     | 100       |  16000      |  0.2    |  0.8    |   40    |   speech_dataset_shift  |    audio    |
 | 11  | Sean    |mobilenet|  93.8%   |  94.7%   |   80%     | 9000,3000  | 0.002,0.0003    | 100   | Momentum    |  10       |   30     | 100       |  16000      |  0.3    |  0.8    |   40    |   speech_dataset         |   audio     |
-| 12  | hong  | mobilenet(hong)      |   95.0 %  |   94.7%   |   83%    | 9000,3000 |   0.002,0.0001  |   50  | Momentum    |   10      |        |      |           |             |         |         |         |                          |             | 
+| 12  | hong  | hongbilenet    |   95.0 %  |   94.7%   |   83%    | 9000,3000 |   0.002,0.0001  |   50  | Momentum    |   10      |        |      |           |             |         |         |         |                          |             | 
 | 13  |         |         |          |          |           |             |                 |       |            |           |          |           |             |         |         |         |                          |             |                                                                              
 
 ## tips
