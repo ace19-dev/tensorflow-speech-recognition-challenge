@@ -207,7 +207,7 @@ def wav_generator_using_posotion(do_print, from_file_name, to_file_name, thresho
                 # Debug
                 if do_print == True:
                     print("Find start pos: ", i, ",  ", samples[i], ",  ", threshold)
-                    start_position = i
+                start_position = i
                 if stop_after_first_start_position:     # 무조건 처음에 찾으면 멈춰?
                     break
         else:
@@ -219,7 +219,7 @@ def wav_generator_using_posotion(do_print, from_file_name, to_file_name, thresho
                 # Debug
                 if do_print == True:
                     print("Invalid frame count over than 100ms: ", samples[i], ", ======> ", invalid_frame_count)
-                    start_position = 0
+                start_position = 0
                 invalid_frame_count = 0
                 process_frame_count = 0
                 continue
@@ -308,12 +308,12 @@ def main():
     do_wav_volume_normalization = False
     wav_volume_normalization_target = -30.0
 
-    from_file_name = "00f0204f_nohash_0"
+    from_file_name = "5a0bc987_nohash_0"
     to_file_name = from_file_name + "____"
 
     wav_generator_using_posotion(do_print, from_file_name, to_file_name, wav_volume_threshold, do_append_silent, do_figure, do_wav_volume_normalization, wav_volume_normalization_target)
 
-    result = wav_generator_using_shift(do_print, from_file_name, to_file_name, wav_volume_threshold)
+    #result = wav_generator_using_shift(do_print, from_file_name, to_file_name, wav_volume_threshold)
 
     max_volume_gain = 20
     #result = wav_generator_using_gain(do_print, from_file_name, to_file_name, wav_volume_threshold, max_volume_gain)

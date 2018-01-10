@@ -73,9 +73,17 @@ def main():
             check_dir(target_path)
 
             target_full_path = os.path.join(target_path, filename)
-            print('\t- file %s (full path: %s -> target full path: %s) (%s/%s)' % (filename, os.path.splitext(full_path)[0], os.path.splitext(target_full_path)[0], process_count, total_file_count))
+            print('\t- %s (full path: %s -> target full path: %s) (%s/%s)' % (filename, full_path, target_full_path, process_count, total_file_count))
 
+            # 예외 파일 처리
             if full_path.find(".wav") == -1:
+                print("%s is not wav file" % full_path)
+                copyfile(full_path, target_full_path)
+                continue
+
+            # _background_noise_ 폴더 제외
+            if full_path.find("_background_noise_") != -1:
+                print("%s is excepted file" % full_path)
                 copyfile(full_path, target_full_path)
                 continue
 
