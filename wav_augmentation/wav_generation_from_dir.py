@@ -39,12 +39,13 @@ def main():
 
     basedir = "D:\\tmp"
     dataset_dir = "speech_dataset"
-    target_dir_prefix = ("_" + str(wav_volume_threshold) + "_")
+    #target_dir_prefix = ("_" + str(wav_volume_threshold) + "_")
+    target_dir_prefix = "_"
     if do_wav_volume_normalization:
         target_dir_prefix += ("_volume_" + str(wav_volume_normalization_target) + "_")
 
     if using_startpoint:
-        target_dir_prefix += ("start_")
+        target_dir_prefix += ("timeshift_")
     if using_shift:
         target_dir_prefix += ("shift")
     if using_gain:

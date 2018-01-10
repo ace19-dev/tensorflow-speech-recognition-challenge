@@ -128,13 +128,24 @@ def print_figure(figure_no, x_val, y_val, x_label, y_label):
 # samples 에서 start position 부터 새로운 to_file 로 저장하는 함수
 def export_wav_from_position(sound, samples, start_position, append_silent, figure_use, figure_no, figure_rate, to_file):
     new_samples = []
-    for i in range(start_position, len(samples)):
-        new_samples.append(samples[i])
+    if start_position > 0:      # 왼쪽으로 민다
+        # 먼저 파형을 복사
+        for i in range(start_position, len(samples)):
+            new_samples.append(samples[i])
 
-    # append silent
-    if append_silent == True:
-        for i in range(0, start_position):
-            new_samples.append(0)
+        # 이후 append silent
+        if append_silent == True:
+            for i in range(0, start_position):
+                new_samples.append(0)
+    else:
+        # 먼저 append silent
+        if append_silent == True:
+            for i in range(0, -start_position):
+                new_samples.append(0)
+
+        # 이후 파형을 append
+        for i in range(0, len(samples)+start_position):
+            new_samples.append(samples[i])
 
     # figure - new
     if figure_use == True:
@@ -194,6 +205,8 @@ def wav_generator_using_posotion(do_print, from_file_name, to_file_name, thresho
         global_figure_no = print_figure(global_figure_no, time, samples, "Time (s)", "Amplitude")
 
     ##### [2] Find start position over than threshold
+    ## start position 은 찾지 않기로 함 - 18.01.10
+    '''
     start_position = 0
     invalid_frame_count = 0
     process_frame_count = 0
@@ -255,6 +268,38 @@ def wav_generator_using_posotion(do_print, from_file_name, to_file_name, thresho
             export_wav_from_position(sound, samples, real_start_position, append_silent, need_to_figure, global_figure_no, rate, to_file)
             gen_no += 1
             real_start_position += gap_value
+    '''
+
+    # 좌/우로 이동해서 총 10개 생성
+    # 왼쪽에서 5번
+    gen_no = 1
+    gap_value = int(frame_per_100 / 2)  # 0.05 초
+    real_start_position = gap_value
+    # while start_position > 0:
+    while gen_no <= 5:
+        to_file = to_file_name + "_gen_left_" + str(gen_no) + ".wav"
+        #print(to_file)
+        # global_figure_no = export_wav_from_position(sound, samples, start_position, append_silent, need_to_figure, global_figure_no, rate, to_file)
+        export_wav_from_position(sound, samples, real_start_position, append_silent, need_to_figure, global_figure_no,
+                                 rate, to_file)
+        gen_no += 1
+        real_start_position += gap_value
+
+    # 오른쪽에서 5번
+    gen_no = 1
+    gap_value = int(frame_per_100 / 2)  # 0.05 초
+    real_start_position = -gap_value
+    # while start_position > 0:
+    while gen_no <= 5:
+        to_file = to_file_name + "_gen_right_" + str(gen_no) + ".wav"
+        #print(to_file)
+        # global_figure_no = export_wav_from_position(sound, samples, start_position, append_silent, need_to_figure, global_figure_no, rate, to_file)
+        export_wav_from_position(sound, samples, real_start_position, append_silent, need_to_figure,
+                                 global_figure_no,
+                                 rate, to_file)
+        gen_no += 1
+        real_start_position -= gap_value
+
 
     '''
     new_wav = []
@@ -308,7 +353,7 @@ def main():
     do_wav_volume_normalization = False
     wav_volume_normalization_target = -30.0
 
-    from_file_name = "5a0bc987_nohash_0"
+    from_file_name = "00f0204f_nohash_0"
     to_file_name = from_file_name + "____"
 
     wav_generator_using_posotion(do_print, from_file_name, to_file_name, wav_volume_threshold, do_append_silent, do_figure, do_wav_volume_normalization, wav_volume_normalization_target)
