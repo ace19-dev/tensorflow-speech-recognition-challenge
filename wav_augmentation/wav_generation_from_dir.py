@@ -1,0 +1,107 @@
+import os
+import sys
+import wave, struct
+import numpy as np
+import matplotlib.pyplot as plt
+from shutil import *
+
+from wav_processor import *
+
+def check_dir(dir):
+    # create directory is not exists
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
+def remove_dir(dir):
+    if os.path.exists(dir):
+        rmtree(dir)
+
+def count_files(dir):
+    x = 0
+    for root, dirs, files in os.walk(dir):
+        for f in files:
+            x = x + 1
+    return x
+
+def main():
+    do_print = False
+    wav_volume_threshold = 1200
+    do_append_silent = True
+    do_figure = False
+    do_wav_volume_normalization = False
+    wav_volume_normalization_target = -30.0
+
+    # 동작 모드
+    using_startpoint = True
+    using_shift = False
+    using_gain = False
+    max_volume_gain = 10
+
+    basedir = "D:\\tmp"
+    dataset_dir = "speech_dataset"
+    target_dir_prefix = ("_" + str(wav_volume_threshold) + "_")
+    if do_wav_volume_normalization:
+        target_dir_prefix += ("_volume_" + str(wav_volume_normalization_target) + "_")
+
+    if using_startpoint:
+        target_dir_prefix += ("start_")
+    if using_shift:
+        target_dir_prefix += ("shift")
+    if using_gain:
+        target_dir_prefix += ("gain_" + str(max_volume_gain))
+
+    target_dir_prefix = dataset_dir + target_dir_prefix
+
+    rootdir = basedir + "\\" + dataset_dir
+    targetdir = basedir + "\\" + target_dir_prefix
+    #remove_dir(targetdir)
+
+    print("root directory prefix: " + rootdir)
+    print("target directory prefix: " + targetdir)
+
+    result = True
+    process_count = 0
+    total_file_count = count_files(rootdir)
+    for root, subdirs, files in os.walk(rootdir):
+        #for subdir in subdirs:
+        #   print('\t- subdirectory ' + subdir)
+
+        for filename in files:
+            process_count += 1
+            full_path = os.path.join(root, filename)
+            target_path = root.replace(dataset_dir, target_dir_prefix)
+            check_dir(target_path)
+
+            target_full_path = os.path.join(target_path, filename)
+            print('\t- file %s (full path: %s -> target full path: %s) (%s/%s)' % (filename, os.path.splitext(full_path)[0], os.path.splitext(target_full_path)[0], process_count, total_file_count))
+
+            if full_path.find(".wav") == -1:
+                copyfile(full_path, target_full_path)
+                continue
+
+            if os.path.exists(full_path):
+                with open(full_path, 'rb') as f:
+                    # 확장자 제거
+                    full_path = os.path.splitext(full_path)[0]
+                    target_full_path = os.path.splitext(target_full_path)[0]
+
+                    if using_startpoint:
+                        result = wav_generator_using_posotion(do_print, full_path, target_full_path, wav_volume_threshold, do_append_silent, do_figure, do_wav_volume_normalization, wav_volume_normalization_target)
+                    if using_shift:
+                        result = wav_generator_using_shift(do_print, full_path, target_full_path, wav_volume_threshold)
+                    if using_shift:
+                        result = wav_generator_using_gain(do_print, full_path, target_full_path, wav_volume_threshold, max_volume_gain)
+
+                    if result == True:
+                        # 원본 copy
+                        copyfile(full_path + ".wav", target_full_path + ".wav")
+
+            if result == False:
+                print("wav_split return False (%s)" % (target_full_path))
+                #break;
+
+        #if result == False:
+        #    break;
+
+if __name__ == '__main__':
+    main()
