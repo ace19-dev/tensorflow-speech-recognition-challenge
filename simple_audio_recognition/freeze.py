@@ -125,7 +125,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--sample_rate',
       type=int,
-      default=16000,
+      default=23000,
       help='Expected sample rate of the wavs',)
   parser.add_argument(
       '--clip_duration_ms',
@@ -160,7 +160,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='conv',
+      default='squeeze',
       help='What model architecture to use')
   parser.add_argument(
       '--wanted_words',

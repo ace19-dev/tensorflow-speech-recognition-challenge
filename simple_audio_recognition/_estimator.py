@@ -18,8 +18,8 @@ import tensorflow as tf
 from tensorflow.contrib.learn.python.learn.learn_io.generator_io import generator_input_fn
 
 import models
-import input_data
-import test_data
+import new_input_data
+import prediction_input_data
 
 def main(_):
   # We want to see all the logging messages for this tutorial.
@@ -32,65 +32,58 @@ def main(_):
   # training data of your own, use `--data_url= ` on the command line to avoid
   # downloading.
   model_settings = models.prepare_model_settings(
-      len(input_data.prepare_words_list(FLAGS.wanted_words.split(','))),
+      len(new_input_data.prepare_words_list(FLAGS.wanted_words.split(','))),
       FLAGS.sample_rate, FLAGS.clip_duration_ms, FLAGS.window_size_ms,
       FLAGS.window_stride_ms, FLAGS.dct_coefficient_count)
 
-  POSSIBLE_LABELS = 'yes no up down left right on off stop go silence unknown'.split()
+  POSSIBLE_LABELS = new_input_data.prepare_words_list(FLAGS.wanted_words.split(','))
   params = dict(
-    seed=2018,
-    batch_size=FLAGS.batch_size,
-    keep_prob=0.5,
-    learning_rate=0.0002,
-    clip_gradients=15.0,
-    use_batch_norm=True,
-    num_classes=len(POSSIBLE_LABELS)
+    # seed=2018,
+    # batch_size=FLAGS.batch_size,
+    # keep_prob=0.5,
+    # learning_rate=0.0002,
+    # clip_gradients=15.0,
+    # use_batch_norm=True,
+    # num_classes=len(POSSIBLE_LABELS)
   )
 
   hparams = tf.contrib.training.HParams(**params)
-  # model_dir = './models'  # folder for model, checkpoints, logs and submission.csv
   run_config = tf.contrib.learn.RunConfig()
   run_config = run_config.replace(model_dir=FLAGS.train_dir)
 
-  audio_processor2 = test_data.AudioProcessor(
+  audio_processor2 = prediction_input_data.AudioProcessor(
     FLAGS.data_dir,
-    FLAGS.test_data_dir,
-    # FLAGS.silence_percentage,
-    # FLAGS.unknown_percentage,
-    FLAGS.wanted_words.split(','),
+    FLAGS.prediction_data_dir,
     model_settings
-    # FLAGS.validation_percentage,
-    # FLAGS.testing_percentage,
   )
-  print('testing data size: ', audio_processor2.set_size('testing'))
-  set_size = audio_processor2.set_size('testing')
-  def test_data_generator():
+
+  set_size = audio_processor2.set_size()
+  print('prediction data size: ', set_size)
+  def prediction_data_generator():
     def generator():
-      for i in xrange(0, set_size, FLAGS.batch_size):
+      for i in xrange(0, set_size, FLAGS.prediction_batch_size):
         # Pull the audio samples we'll use for testing.
-        fname, fingerprints = audio_processor2.get_data(
-            FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
+        fname, fingerprints = \
+          audio_processor2.get_data(FLAGS.prediction_batch_size, i,
+                                    model_settings, 0.0, 0.0, 0, sess)
 
         yield dict(
-          fname=np.string_(fname),
-          input_data=fingerprints
+          fname=fname,
+          fingerprint_input=fingerprints
         )
 
     return generator
 
   test_input_fn = generator_input_fn(
-    x=test_data_generator(),
-    batch_size=hparams.batch_size,
-    shuffle=False,
-    num_epochs=1,
-    queue_capacity=10 * hparams.batch_size,
-    num_threads=1
+    x=prediction_data_generator(),
+    batch_size=FLAGS.prediction_batch_size,
+    queue_capacity=10 * FLAGS.prediction_batch_size,
   )
 
   def model_fn(features, labels, mode, params):
     """Model function for Estimator."""
     logits = models.create_model(
-      tf.cast(features['input_data'], tf.float32),
+      tf.cast(features['fingerprint_input'], tf.float32),
       model_settings,
       FLAGS.model_architecture,
       is_training=False)
@@ -108,8 +101,7 @@ def main(_):
     return tf.estimator.EstimatorSpec(**specs)
 
 
-
-  def get_estimator(config=None, hparams=None):
+  def get_estimator(config, hparams):
     """Return the model as a Tensorflow Estimator object.
     Args:
        run_config (RunConfig): Configuration for Estimator run.
@@ -117,12 +109,14 @@ def main(_):
     """
     return tf.estimator.Estimator(
       model_fn=model_fn,
-      config=config,
-      params=hparams,
+      config=config
+      # params=hparams,
     )
+
 
   estimator = get_estimator(config=run_config, hparams=hparams)
   it = estimator.predict(input_fn=test_input_fn)
+
 
   id2name = {i: name for i, name in enumerate(POSSIBLE_LABELS)}
   # last batch will contain padding, so remove duplicates
@@ -132,17 +126,12 @@ def main(_):
     # print("fname >>> : ", fname, ", ", "label >>> : ", label)
     submission[fname] = label
 
-  fin = open(os.path.join(FLAGS.train_dir, 'sample_submission.csv'), 'rb')
-  reader = csv.reader(fin)
-  headers = reader.next()
-  fout = open(os.path.join(FLAGS.train_dir, 'submission.csv'), 'wb')
+  # make submission.csv
+  fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'w', encoding='utf-8', newline='')
   writer = csv.writer(fout)
-  writer.writerow(headers)
-  for row in reader:
-    row[1] = submission[row[0]]
-    writer.writerow(row)
-
-  fin.close()
+  writer.writerow(['fname', 'label'])
+  for key in sorted(submission.keys()):
+    writer.writerow([key, submission[key]])
   fout.close()
 
 
@@ -156,7 +145,7 @@ if __name__ == '__main__':
       Where to download the speech training data to.
       """)
   parser.add_argument(
-      '--test_data_dir',
+      '--prediction_data_dir',
       type=str,
       default='../../../dl_data/speech_commands/test/audio/',
       help="""\
@@ -188,9 +177,9 @@ if __name__ == '__main__':
       default=40,
       help='How many bins to use for the MFCC fingerprint',)
   parser.add_argument(
-    '--batch_size',
+    '--prediction_batch_size',
     type=int,
-    default=1,
+    default=5000,
     help='How many items to train with at once', )
   parser.add_argument(
       '--wanted_words',
@@ -200,12 +189,12 @@ if __name__ == '__main__':
   parser.add_argument(
     '--train_dir',
     type=str,
-    default='./models/173704',
+    default='./models',
     help='Directory to write event logs and checkpoint.')
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='mobile',
+      default='conv',
       help='What model architecture to use')
 
 
