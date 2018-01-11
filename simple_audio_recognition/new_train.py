@@ -118,16 +118,11 @@ def main(_):
 
   fingerprint_input = tf.placeholder(
       tf.float32, [None, fingerprint_size], name='fingerprint_input')
-  # logits, dropout_prob = models.create_model(
-  #     fingerprint_input,
-  #     model_settings,
-  #     FLAGS.model_architecture,
-  #     is_training=True)
-  logits, _ = models.create_model(
-    fingerprint_input,
-    model_settings,
-    FLAGS.model_architecture,
-    is_training=True)
+  logits, dropout_prob = models.create_model(
+      fingerprint_input,
+      model_settings,
+      FLAGS.model_architecture,
+      is_training=True)
 
   # Define loss and optimizer
   ground_truth_input = tf.placeholder(
@@ -217,7 +212,7 @@ def main(_):
             ground_truth_input: train_ground_truth,
             learning_rate_input: learning_rate_value,
             momentum: 0.95,
-            # dropout_prob: 0.5
+            dropout_prob: 0.5
         })
     train_writer.add_summary(train_summary, training_step)
     tf.logging.info('Step #%d: rate %f, accuracy %.1f%%, cross entropy %f' %
@@ -239,7 +234,7 @@ def main(_):
             feed_dict={
                 fingerprint_input: validation_fingerprints,
                 ground_truth_input: validation_ground_truth,
-                # dropout_prob: 1.0
+                dropout_prob: 1.0
             })
         validation_writer.add_summary(validation_summary, training_step)
         batch_size = min(FLAGS.batch_size, set_size - i)
@@ -272,7 +267,7 @@ def main(_):
         feed_dict={
             fingerprint_input: test_fingerprints,
             ground_truth_input: test_ground_truth,
-            # dropout_prob: 1.0
+            dropout_prob: 1.0
         })
     batch_size = min(FLAGS.batch_size, set_size - i)
     total_accuracy += (test_accuracy * batch_size) / set_size
@@ -305,7 +300,7 @@ def main(_):
                                feed_dict={
                                  # fingerprint_input: tf.cast(input, tf.float32),
                                  fingerprint_input: fingerprints,
-                                 # dropout_prob: 1.0
+                                 dropout_prob: 1.0
                                })
     size = len(fname)
     for n in xrange(0, size):
