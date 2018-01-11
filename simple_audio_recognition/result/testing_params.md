@@ -15,6 +15,7 @@
 | 12  | hong  | hongbilenet    |   95.0 %  |   94.7%   |   83%    | 9000,3000 |   0.002,0.0001  |   50  | Momentum    |   10      |        |      |           |             |         |         |         |                          |             | 
 | 12  | hong  | resnet    |   94.5 %  |   95.7%   |   83%    | 9000,3000 |   0.002,0.0001  |   50  | Momentum    |   10      |        |      |           |             |         |         |         |                          |             |                 
 |  13 | joongjum| squeeze |  95.1%   |  94.9%   |   84 %    | 9000,6000  | 0.001,0.0001    | 100   | Adam    |  10       |   30     | 100       |  16000      |  0.2    |  0.8    |   40    |   speech_dataset_shift  |    audio    |
+|  14 | hong| hongbilenet |  95.2%   |  96.5%   |   85 %    | 9000,3000  | 0.003,0.0001    | 50   | RMSProp    |  10       |   30     | 100       |  16000      |  0.2    |  0.8    |   40    |   speech_dataset  |    audio    |
 
 ## tips
 - validation accuracy/loss 그래프 변화를 살펴보고 오버피팅 여부를 파악하여 epoch 값을 정한다.
