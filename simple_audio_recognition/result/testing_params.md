@@ -17,6 +17,7 @@
 |  13 | joongjum| squeeze |  95.1%   |  94.9%   |   84%    | 9000,6000  | 0.001,0.0001    | 100   | Adam    |  10       |   30     | 100       |  16000      |  0.2    |  0.8    |   40    |   speech_dataset_shift  |    audio    |
 |  14 | hong| hongbilenet |  95.2%   |  96.5%   |   85 %    | 9000,3000  | 0.003,0.0001    | 50   | RMSProp    |  10       |   30     | 100       |  16000      |  0.3    |  0.8    |   40    |   speech_dataset  |    audio    |
 |  15 | joongjum| squeeze |  95.0%   |  94.6%   |   84%(better than No.13)    | 9000,6000  | 0.001,0.0001    | 100   | Adam    |  10       |   30     | 100       |  16000      |  0.3    |  0.8    |   40    |   speech_dataset_shift  |    audio    |
+|  16 | joongjum| squeeze |  94.8%   |  95.0%   |   85%    | 9000,3000  | 0.001,0.0001    | 100   | Adam    |  10       |   30     | 100       |  16000      |  0.3    |  0.8    |   40    |   speech_dataset_shift  |    audio    |
 
 
 ## tips
