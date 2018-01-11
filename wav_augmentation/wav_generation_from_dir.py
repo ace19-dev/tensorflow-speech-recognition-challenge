@@ -33,23 +33,21 @@ def main():
 
     # 동작 모드
     using_startpoint = True
-    using_shift = False
-    using_gain = False
-    max_volume_gain = 10
+    using_gain = True
+    volume_gain_min = -35
+    volume_gain_max = -20
+    volume_gain_step = 5
 
     basedir = "D:\\tmp"
     dataset_dir = "speech_dataset"
-    #target_dir_prefix = ("_" + str(wav_volume_threshold) + "_")
     target_dir_prefix = "_"
-    if do_wav_volume_normalization:
-        target_dir_prefix += ("_volume_" + str(wav_volume_normalization_target) + "_")
+    #if do_wav_volume_normalization:
+    #    target_dir_prefix += ("_volume_" + str(wav_volume_normalization_target) + "_")
 
     if using_startpoint:
         target_dir_prefix += ("timeshift_")
-    if using_shift:
-        target_dir_prefix += ("shift")
     if using_gain:
-        target_dir_prefix += ("gain_" + str(max_volume_gain))
+        target_dir_prefix += ("gain_")
 
     target_dir_prefix = dataset_dir + target_dir_prefix
 
@@ -96,14 +94,25 @@ def main():
 
                     if using_startpoint:
                         result = wav_generator_using_posotion(do_print, full_path, target_full_path, wav_volume_threshold, do_append_silent, do_figure, do_wav_volume_normalization, wav_volume_normalization_target)
-                    if using_shift:
-                        result = wav_generator_using_shift(do_print, full_path, target_full_path, wav_volume_threshold)
-                    if using_shift:
-                        result = wav_generator_using_gain(do_print, full_path, target_full_path, wav_volume_threshold, max_volume_gain)
 
                     if result == True:
                         # 원본 copy
                         copyfile(full_path + ".wav", target_full_path + ".wav")
+
+                    if result == True and using_gain:
+                        gen_file_name = []
+                        gen_file_name.append(target_full_path)
+                        gen_file_name.append(target_full_path + "_gen_left_1")
+                        gen_file_name.append(target_full_path + "_gen_left_2")
+                        gen_file_name.append(target_full_path + "_gen_right_1")
+                        gen_file_name.append(target_full_path + "_gen_right_2")
+
+                        for i in range(0, len(gen_file_name)):
+                            from_file_name = gen_file_name[i]
+                            to_file_name = from_file_name + "___"
+                            result = wav_generator_using_gain(do_print, from_file_name, to_file_name,
+                                                              wav_volume_threshold, volume_gain_min, volume_gain_max,
+                                                              volume_gain_step, do_figure)
 
             if result == False:
                 print("wav_split return False (%s)" % (target_full_path))
