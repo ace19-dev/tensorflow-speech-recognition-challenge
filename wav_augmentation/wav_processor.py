@@ -9,21 +9,25 @@ from pydub import AudioSegment
 ########################################################################################## Utility ################
 global global_figure_no
 
+
 # silent 인지 여부 체크
 def is_silent(threshold, peak_value):
     if pow(threshold, 2) >= pow(peak_value, 2):
         return True
     return False
 
+
 def get_sound(file):
     # AudioSegment
-    #sound = AudioSegment.from_file(file, "wav")
+    # sound = AudioSegment.from_file(file, "wav")
     sound = AudioSegment.from_wav(file)
     return sound
+
 
 def match_target_amplitude(sound, target_dBFS):
     change_in_dBFS = target_dBFS - sound.dBFS
     return sound.apply_gain(change_in_dBFS)
+
 
 def get_normalized_sound(file, normalization_target_amp):
     # AudioSegment
@@ -31,12 +35,14 @@ def get_normalized_sound(file, normalization_target_amp):
     normalized_sound = match_target_amplitude(sound, normalization_target_amp)
     return sound
 
+
 def print_figure(figure_no, x_val, y_val, x_label, y_label):
     plt.subplot(figure_no)
     plt.plot(x_val, y_val, linewidth=0.1, color='#000000')
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    return figure_no+1
+    return figure_no + 1
+
 
 ######################################################################################## np.xxx_shift 기반 #######
 
@@ -58,6 +64,7 @@ def export_wav_using_shift(samples, sound, is_right_shift, shift_val, figure_use
     new_sound = sound._spawn(shifted_samples_array)
     new_sound.export(to_file, format="wav")
     return
+
 
 # from_file 을 읽고 silent 가 아니면 export_wav_using_shift 함수 호출
 def wav_generator_using_shift(do_print, from_file_name, to_file_name, threshold, need_to_figure):
@@ -102,25 +109,26 @@ def wav_generator_using_shift(do_print, from_file_name, to_file_name, threshold,
 
     # right shift
     if using_right_shift:
-        for i in range(shift_from_val, shift_to_val+1):
+        for i in range(shift_from_val, shift_to_val + 1):
             is_right_shift = True
             to_file = to_file_name + "_right" + str(i) + ".wav"
             export_wav_using_shift(samples, sound, is_right_shift, i, need_to_figure, global_figure_no,
-                                 rate, to_file)
+                                   rate, to_file)
 
     # left shift
     if using_left_shift:
-        for i in range(shift_from_val, shift_to_val+1):
+        for i in range(shift_from_val, shift_to_val + 1):
             is_right_shift = False
             to_file = to_file_name + "_left" + str(i) + ".wav"
             export_wav_using_shift(samples, sound, is_right_shift, i, need_to_figure, global_figure_no,
-                                 rate, to_file)
+                                   rate, to_file)
 
     # figure
     if need_to_figure == True:
         plt.show()
 
     return True
+
 
 ############################################################################# AudioSegment.apply_gain 기반 #######
 
@@ -140,8 +148,10 @@ def export_wav_using_gain(sound, value, figure_use, figure_no, to_file):
 
     return
 
+
 # from_file 을 읽고 silent 가 아니면 export_wav_using_gain 함수 호출
-def wav_generator_using_gain(do_print, from_file_name, to_file_name, threshold, volume_gain_min, volume_gain_max, volume_gain_step, need_to_figure):
+def wav_generator_using_gain(do_print, from_file_name, to_file_name, threshold, volume_gain_min, volume_gain_max,
+                             volume_gain_step, need_to_figure):
     from_file = from_file_name + ".wav"
 
     ##### [0] variables
@@ -180,8 +190,8 @@ def wav_generator_using_gain(do_print, from_file_name, to_file_name, threshold, 
         target_dbFS += volume_gain_step
 
     # test
-    #to_file = to_file_name + "_vol_normal.wav"
-    #export_wav_using_gain(sound, sound.max_dBFS, need_to_figure, global_figure_no, to_file)
+    # to_file = to_file_name + "_vol_normal.wav"
+    # export_wav_using_gain(sound, sound.max_dBFS, need_to_figure, global_figure_no, to_file)
 
     # figure
     if need_to_figure == True:
@@ -189,12 +199,14 @@ def wav_generator_using_gain(do_print, from_file_name, to_file_name, threshold, 
 
     return True
 
+
 ################################################################################## start_position 기반 ##############
 
 # samples 에서 start position 부터 새로운 to_file 로 저장하는 함수
-def export_wav_from_position(sound, samples, start_position, append_silent, figure_use, figure_no, figure_rate, to_file):
+def export_wav_from_position(sound, samples, start_position, append_silent, figure_use, figure_no, figure_rate,
+                             to_file):
     new_samples = []
-    if start_position > 0:      # 왼쪽으로 민다
+    if start_position > 0:  # 왼쪽으로 민다
         # 먼저 파형을 복사
         for i in range(start_position, len(samples)):
             new_samples.append(samples[i])
@@ -210,7 +222,7 @@ def export_wav_from_position(sound, samples, start_position, append_silent, figu
                 new_samples.append(0)
 
         # 이후 파형을 append
-        for i in range(0, len(samples)+start_position):
+        for i in range(0, len(samples) + start_position):
             new_samples.append(samples[i])
 
     # figure - new
@@ -225,8 +237,10 @@ def export_wav_from_position(sound, samples, start_position, append_silent, figu
     new_sound.export(to_file, format="wav")
     return
 
+
 # from_file 을 읽고 silent 가 아니면, start position 을 찾은 후 export_wav_from_position 함수 호출
-def wav_generator_using_posotion(do_print, from_file_name, to_file_name, threshold, append_silent, need_to_figure, need_to_normalization, normalization_target_amp):
+def wav_generator_using_posotion(do_print, from_file_name, to_file_name, threshold, append_silent, need_to_figure,
+                                 need_to_normalization, normalization_target_amp):
     from_file = from_file_name + ".wav"
 
     # wav volume normalization
@@ -250,10 +264,6 @@ def wav_generator_using_posotion(do_print, from_file_name, to_file_name, thresho
         print("Number of Total Frames: ", f)
     '''
 
-    # figure
-    if need_to_figure == True:
-        plt.figure(1)
-
     ##### [0] variables
     global_figure_no = 211
 
@@ -263,12 +273,51 @@ def wav_generator_using_posotion(do_print, from_file_name, to_file_name, thresho
     rate = sound.frame_rate
     total_frames = len(samples)
     time = np.arange(0, total_frames, 1) / rate
-    frame_per_100 = int(rate / 10)             # 0.1초에 대한 데이터의 개수
+    frame_per_100 = int(rate / 10)  # 0.1초에 대한 데이터의 개수
+
+    # silent check
+    if sound.max == 0:
+        if do_print:
+            print("peak_amplitude is 0")
+        return False
+
+    # figure
+    if need_to_figure == True:
+        plt.figure(1)
 
     # figure - org
     if need_to_figure == True:
         # plot amplitude (or loudness) over time
         global_figure_no = print_figure(global_figure_no, time, samples, "Time (s)", "Amplitude")
+
+    '''
+    # speed control
+    speedup_sound = sound.speedup(1.25)
+    to_file = to_file_name + "1.25x.wav"
+    speedup_sound.export(to_file, format="wav")
+
+    speedup_sound = sound.speedup(1.5)
+    to_file = to_file_name + "1.5x.wav"
+    speedup_sound.export(to_file, format="wav")
+
+    speedup_sound = sound.speedup(1.75)
+    to_file = to_file_name + "1.75x.wav"
+    speedup_sound.export(to_file, format="wav")
+
+    speedup_sound = sound.speedup(2.0)
+    to_file = to_file_name + "2.0x.wav"
+    speedup_sound.export(to_file, format="wav")
+
+    # figure - new
+    # plot amplitude (or loudness) over time
+    samples2 = speedup_sound.get_array_of_samples()
+    time = np.arange(0, len(samples2), 1) / speedup_sound.frame_rate
+    global_figure_no = print_figure(global_figure_no, time, samples2, "Time (s)", "Amplitude")
+
+    plt.show()
+
+    return
+    '''
 
     ##### [2] Find start position over than threshold
     ## start position 은 찾지 않기로 함 - 18.01.10
@@ -337,34 +386,33 @@ def wav_generator_using_posotion(do_print, from_file_name, to_file_name, thresho
     '''
 
     # 좌/우로 이동해서 총 4개 생성
-    # gap_value = int(frame_per_100 / 2)  # 0.05 초
-    gap_value = int(frame_per_100)  # 0.1 초
+    gap_value = int(frame_per_100 / 2)  # 0.05 초
+    # gap_value = int(frame_per_100)  # 0.1 초
 
-    # 왼쪽으로 2번
+    # 왼쪽으로 5번
     gen_no = 1
     real_start_position = gap_value
-    while gen_no <= 2:
+    while gen_no <= 5:
         to_file = to_file_name + "_gen_left_" + str(gen_no) + ".wav"
-        #print(to_file)
+        # print(to_file)
         # global_figure_no = export_wav_from_position(sound, samples, start_position, append_silent, need_to_figure, global_figure_no, rate, to_file)
         export_wav_from_position(sound, samples, real_start_position, append_silent, need_to_figure, global_figure_no,
                                  rate, to_file)
         gen_no += 1
         real_start_position += gap_value
 
-    # 오른쪽으로 2번
+    # 오른쪽으로 4번
     gen_no = 1
     real_start_position = -gap_value
-    while gen_no <= 2:
+    while gen_no <= 4:
         to_file = to_file_name + "_gen_right_" + str(gen_no) + ".wav"
-        #print(to_file)
+        # print(to_file)
         # global_figure_no = export_wav_from_position(sound, samples, start_position, append_silent, need_to_figure, global_figure_no, rate, to_file)
         export_wav_from_position(sound, samples, real_start_position, append_silent, need_to_figure,
                                  global_figure_no,
                                  rate, to_file)
         gen_no += 1
         real_start_position -= gap_value
-
 
     '''
     new_wav = []
@@ -410,6 +458,8 @@ def wav_generator_using_posotion(do_print, from_file_name, to_file_name, thresho
 
     return True
 
+#################################################################### speed control #########
+
 def main():
     do_print = True
     wav_volume_threshold = 1200
@@ -418,31 +468,37 @@ def main():
     do_wav_volume_normalization = False
     wav_volume_normalization_target = -30.0
 
-    from_file_name = "00f0204f_nohash_0"
+    from_file_name = "clip_00ad51776"
     to_file_name = from_file_name + "__"
 
-    result = wav_generator_using_posotion(do_print, from_file_name, to_file_name, wav_volume_threshold, do_append_silent, do_figure, do_wav_volume_normalization, wav_volume_normalization_target)
+    result = wav_generator_using_posotion(do_print, from_file_name, to_file_name, wav_volume_threshold,
+                                          do_append_silent, do_figure, do_wav_volume_normalization,
+                                          wav_volume_normalization_target)
 
     gen_file_name = []
     if result == True:
         gen_file_name.append(from_file_name)
-        gen_file_name.append(to_file_name + "_gen_left_1")
-        gen_file_name.append(to_file_name + "_gen_left_2")
-        gen_file_name.append(to_file_name + "_gen_right_1")
-        gen_file_name.append(to_file_name + "_gen_right_2")
+        # 왼쪽으로 5번
+        for i in range(1, 5 + 1):
+            gen_file_name.append(to_file_name + "_gen_left_" + str(i))
+        # 오른쪽으로 4번
+        for i in range(1, 4 + 1):
+            gen_file_name.append(to_file_name + "_gen_right_" + str(i))
 
-    volume_gain_min = -35
-    volume_gain_max = -20
-    volume_gain_step = 5
-    for i in range(0, len(gen_file_name)):
-        from_file_name = gen_file_name[i]
-        to_file_name = from_file_name + "___"
-        result = wav_generator_using_gain(do_print, from_file_name, to_file_name, wav_volume_threshold, volume_gain_min, volume_gain_max, volume_gain_step, do_figure)
+        volume_gain_min = -35
+        volume_gain_max = -19
+        volume_gain_step = 2
+        for i in range(0, len(gen_file_name)):
+            from_file_name = gen_file_name[i]
+            to_file_name = from_file_name + "___"
+            result = wav_generator_using_gain(do_print, from_file_name, to_file_name, wav_volume_threshold,
+                                              volume_gain_min, volume_gain_max, volume_gain_step, do_figure)
 
     ####result = wav_generator_using_shift(do_print, from_file_name, to_file_name, wav_volume_threshold, do_figure)
-    #if result == True:
-        # 원본 copy
-        #copyfile(from_file_name+".wav", to_file_name+".wav")
+    # if result == True:
+    # 원본 copy
+    # copyfile(from_file_name+".wav", to_file_name+".wav")
+
 
 if __name__ == '__main__':
     main()

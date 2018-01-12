@@ -35,8 +35,8 @@ def main():
     using_startpoint = True
     using_gain = True
     volume_gain_min = -35
-    volume_gain_max = -20
-    volume_gain_step = 5
+    volume_gain_max = -19
+    volume_gain_step = 2
 
     basedir = "D:\\tmp"
     dataset_dir = "speech_dataset"
@@ -47,7 +47,7 @@ def main():
     if using_startpoint:
         target_dir_prefix += ("timeshift_")
     if using_gain:
-        target_dir_prefix += ("gain_")
+        target_dir_prefix += ("gain_10x_")
 
     target_dir_prefix = dataset_dir + target_dir_prefix
 
@@ -102,10 +102,12 @@ def main():
                     if result == True and using_gain:
                         gen_file_name = []
                         gen_file_name.append(target_full_path)
-                        gen_file_name.append(target_full_path + "_gen_left_1")
-                        gen_file_name.append(target_full_path + "_gen_left_2")
-                        gen_file_name.append(target_full_path + "_gen_right_1")
-                        gen_file_name.append(target_full_path + "_gen_right_2")
+                        # 왼쪽으로 5번
+                        for i in range(1, 5 + 1):
+                            gen_file_name.append(target_full_path + "_gen_left_" + str(i))
+                        # 오른쪽으로 4번
+                        for i in range(1, 4 + 1):
+                            gen_file_name.append(target_full_path + "_gen_right_" + str(i))
 
                         for i in range(0, len(gen_file_name)):
                             from_file_name = gen_file_name[i]
