@@ -18,6 +18,7 @@
 |  15 | joongjum| squeeze |  95.0%   |  94.6%   |   84%(better than No.13)    | 9000,6000  | 0.001,0.0001    | 100   | Adam    |  10       |   30     | 100       |  16000      |  0.3    |  0.8    |   40    |   speech_dataset_shift  |    audio    |
 |  16 | joongjum| squeeze |  94.8%   |  95.0%   |   85%    | 9000,3000  | 0.001,0.0001    | 100   | Adam    |  10       |   30     | 100       |  16000      |  0.3    |  0.8    |   40    |   speech_dataset_shift  |    audio    |
 |  17 | joongjum| squeeze |  94.3%   |  94.1%   |   86%    | 18000,6000  | 0.001,0.0001    | 100   | Adam    |  10       |   30     | 100       |  16000      |  0.3    |  0.8    |   40    |   speech_dataset_shift_gain_  |    audio    |
+|  17 | joongjum| squeeze |  94.3%   |  94.6%   |   85%    | 18000,6000  | 0.001,0.0001    | 100   | Adam    |  10       |   30     | 100       |  16000      |  0.3    |  0.7    |   40    |   speech_dataset_shift_gain_  |    audio    |
 
 
 ## tips
