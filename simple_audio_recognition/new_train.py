@@ -146,9 +146,9 @@ def main(_):
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
     # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
+    # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
     # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    # train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
+    train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
   correct_prediction = tf.equal(predicted_indices, ground_truth_input)
   confusion_matrix = tf.confusion_matrix(
@@ -199,7 +199,7 @@ def main(_):
     # Pull the audio samples we'll use for training.
     train_fingerprints, train_ground_truth = \
       audio_processor.get_data(
-        FLAGS.batch_size, 0, model_settings, FLAGS.background_frequency,
+        FLAGS.batch_size, -1, model_settings, FLAGS.background_frequency,
         FLAGS.background_volume, time_shift_samples, 'training', sess)
     # Run the graph with this batch of training data.
     train_summary, train_accuracy, cross_entropy_value, _, _ = sess.run(
@@ -308,7 +308,7 @@ def main(_):
     print(i+size)
 
   # make submission.csv
-  fout = open(os.path.join(FLAGS.result_dir, 'submission.csv'), 'w', encoding='utf-8', newline='')
+  fout = open(os.path.join(FLAGS.result_dir, 'submission_' + FLAGS.model_architecture + '.csv'), 'w', encoding='utf-8', newline='')
   writer = csv.writer(fout)
   writer.writerow(['fname', 'label'])
   for key in sorted(submission.keys()):
@@ -328,7 +328,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='../../../dl_data/speech_commands/speech_dataset/',
+      default='/share/speech_dataset_timeshift_gain_',
       help="""\
       Where to download the speech training data to.
       """)
@@ -342,7 +342,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--background_volume',
       type=float,
-      default=0.2,
+      default=0.3,
       help="""\
       How loud the background noise should be, between 0 and 1.
       """)
@@ -363,7 +363,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--unknown_percentage',
       type=float,
-      default=10.0,
+      default=8.0,
       help="""\
       How much of the training data should be unknown words.
       """)
@@ -412,7 +412,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='9000,3000',
+      default='9000,5000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -422,7 +422,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.005,0.001',
+      default='0.002,0.0001',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
@@ -462,12 +462,12 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='squeeze',
+      default='mobile2',
       help='What model architecture to use')
   parser.add_argument(
     '--prediction_batch_size',
     type=int,
-    default=5000,
+    default=100,
     help='How many items to predict with at once', )
   parser.add_argument(
       '--check_nans',

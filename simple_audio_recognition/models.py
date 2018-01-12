@@ -23,6 +23,8 @@ import math
 
 import tensorflow as tf
 
+import mobilenet
+
 slim = tf.contrib.slim
 
 def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
@@ -103,6 +105,8 @@ def create_model(fingerprint_input, model_settings, model_architecture,
     return create_conv_model(fingerprint_input, model_settings, is_training)
   elif model_architecture == 'mobile':
     return create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_training)
+  elif model_architecture == 'mobile2':
+    return create_mobilenet_model(fingerprint_input, model_settings, is_training)
   elif model_architecture == 'low_latency_conv':
     return create_low_latency_conv_model(fingerprint_input, model_settings,
                                          is_training)
@@ -310,7 +314,11 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
 
   print('... ')
   print('... ')
-  print('after fingerprint_4d', fingerprint_4d)
+
+  modify_input = tf.image.resize_bilinear(fingerprint_4d, [224, 224])
+
+  print('after modify_input', modify_input)
+
 
   # Conv / s2
 
@@ -325,10 +333,10 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
   print('after first_weights', first_weights)
 
   first_bias = tf.Variable(tf.zeros([first_filter_count]))
-  first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 2, 2, 1],
-                            'VALID') + first_bias
+  first_conv = tf.nn.conv2d(modify_input, first_weights, [1, 2, 2, 1], 'SAME') + first_bias
 
-  first_bn = slim.batch_norm(first_conv, is_training=is_training, scope='bn1')
+  #first_bn = slim.batch_norm(first_conv)
+  first_bn = BatchNorm(first_conv, is_training, name='bn1')
   first_relu = tf.nn.relu(first_bn)
 
   print('after first_relu', first_relu)
@@ -350,7 +358,8 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
   second_conv = tf.nn.conv2d(first_relu, second_weights, [1, 1, 1, 1],
                             'SAME') + second_bias
 
-  second_bn = slim.batch_norm(second_conv, is_training=is_training, scope='bn2')
+  #second_bn = slim.batch_norm(second_conv)
+  second_bn = BatchNorm(second_conv, is_training, name='bn2')
   second_relu = tf.nn.relu(second_bn)
 
   print('after second_relu', second_relu)
@@ -368,7 +377,8 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
   third_conv = tf.nn.conv2d(second_relu, third_weights, [1, 1, 1, 1],
                              'SAME') + third_bias
 
-  third_bn = slim.batch_norm(third_conv, is_training=is_training, scope='bn3')
+  #third_bn = slim.batch_norm(third_conv)
+  third_bn = BatchNorm(third_conv, is_training, name='bn3')
   third_relu = tf.nn.relu(third_bn)
 
   print('after third_relu', third_relu)
@@ -380,9 +390,10 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
   fourth_bias = tf.Variable(tf.zeros([64]))
 
   fourth_conv = tf.nn.conv2d(third_relu, fourth_weights, [1, 2, 2, 1],
-                             'VALID') + fourth_bias
+                             'SAME') + fourth_bias
 
-  fourth_bn = slim.batch_norm(fourth_conv, is_training=is_training, scope='bn4')
+  #fourth_bn = slim.batch_norm(fourth_conv)
+  fourth_bn = BatchNorm(fourth_conv, is_training, name='bn4')
   fourth_relu = tf.nn.relu(fourth_bn)
 
   print('after fourth_relu', fourth_relu)
@@ -397,7 +408,8 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
                              'SAME') + fifth_bias
 
 
-  fifth_bn = slim.batch_norm(fifth_conv, is_training=is_training, scope='bn5')
+  #fifth_bn = slim.batch_norm(fifth_conv)
+  fifth_bn = BatchNorm(fifth_conv, is_training, name='bn5')
   fifth_relu = tf.nn.relu(fifth_bn)
 
   print('after fifth_relu', fifth_relu)
@@ -411,7 +423,8 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
   sixth_conv = tf.nn.conv2d(fifth_relu, sixth_weights, [1, 1, 1, 1],
                              'SAME') + sixth_bias
 
-  sixth_bn = slim.batch_norm(sixth_conv, is_training=is_training, scope='bn6')
+  #sixth_bn = slim.batch_norm(sixth_conv)
+  sixth_bn = BatchNorm(sixth_conv, is_training, name='bn6')
   sixth_relu = tf.nn.relu(sixth_bn)
 
   print('after sixth_relu', sixth_relu)
@@ -426,7 +439,8 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
                              'SAME') + seventh_bias
 
 
-  seventh_bn = slim.batch_norm(seventh_conv, is_training=is_training, scope='bn7')
+  #seventh_bn = slim.batch_norm(seventh_conv)
+  seventh_bn = BatchNorm(seventh_conv, is_training, name='bn7')
   seventh_relu = tf.nn.relu(seventh_bn)
 
   print('after seventh_relu', seventh_relu)
@@ -439,35 +453,264 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
   eighth_bias = tf.Variable(tf.zeros([128]))
 
   eighth_conv = tf.nn.conv2d(seventh_relu, eighth_weights, [1, 2, 2, 1],
-                             'VALID') + sixth_bias
+                             'SAME') + sixth_bias
 
-  eighth_bn = slim.batch_norm(eighth_conv, is_training=is_training, scope='bn8')
+  #eighth_bn = slim.batch_norm(eighth_conv)
+  eighth_bn = BatchNorm(eighth_conv, is_training, name='bn8')
   eighth_relu = tf.nn.relu(eighth_bn)
 
   print('after eighth_relu', eighth_relu)
 
-  avg_pool = tf.nn.avg_pool(eighth_relu, [1, 4, 4, 1], [1, 1, 1, 1], 'VALID')
+
+
+
+
+  
+  nineth_weights = tf.get_variable("nineth_weights",
+    shape=[one_filter_height, one_filter_width, 128, 256],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  nineth_bias = tf.Variable(tf.zeros([256]))
+
+  nineth_conv = tf.nn.conv2d(eighth_relu, nineth_weights, [1, 1, 1, 1],
+                             'SAME') + nineth_bias
+
+
+  #nineth_bn = slim.batch_norm(nineth_conv)
+  nineth_bn = BatchNorm(nineth_conv, is_training, name='bn9')
+  nineth_relu = tf.nn.relu(nineth_bn)
+
+  print('after nineth_relu', nineth_relu)
+
+
+
+
+
+
+
+  tenth_weights = tf.get_variable("tenth_weights",
+    shape=[deepwise_filter_height, deepwise_filter_width, 256, 256],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  tenth_bias = tf.Variable(tf.zeros([256]))
+
+  tenth_conv = tf.nn.conv2d(nineth_relu, tenth_weights, [1, 1, 1, 1],
+                             'SAME') + tenth_bias
+
+  #tenth_bn = slim.batch_norm(tenth_conv)
+  tenth_bn = BatchNorm(tenth_conv, is_training, name='bn10')
+  tenth_relu = tf.nn.relu(tenth_bn)
+
+  print('after tenth_relu', tenth_relu)
+
+
+
+
+
+  eleventh_weights = tf.get_variable("eleventh_weights",
+    shape=[one_filter_height, one_filter_width, 256, 256],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  eleventh_bias = tf.Variable(tf.zeros([256]))
+
+  eleventh_conv = tf.nn.conv2d(tenth_relu, eleventh_weights, [1, 1, 1, 1],
+                             'SAME') + eleventh_bias
+
+
+  #eleventh_bn = slim.batch_norm(eleventh_conv)
+  eleventh_bn = BatchNorm(eleventh_conv, is_training, name='bn11')
+  eleventh_relu = tf.nn.relu(eleventh_bn)
+
+  print('after eleventh_relu', eleventh_relu)
+
+
+
+
+
+  twelfth_weights = tf.get_variable("twelfth_weights",
+    shape=[deepwise_filter_height, deepwise_filter_width, 256, 256],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  twelfth_bias = tf.Variable(tf.zeros([256]))
+
+  twelfth_conv = tf.nn.conv2d(eleventh_relu, twelfth_weights, [1, 2, 2, 1],
+                             'SAME') + twelfth_bias
+
+  #twelfth_bn = slim.batch_norm(twelfth_conv)
+  twelfth_bn = BatchNorm(twelfth_conv, is_training, name='bn12')
+  twelfth_relu = tf.nn.relu(twelfth_bn)
+
+  print('after twelfth_relu', twelfth_relu)
+
+
+
+
+
+
+  thirteenth_weights = tf.get_variable("thirteenth_weights",
+    shape=[one_filter_height, one_filter_width, 256, 512],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  thirteenth_bias = tf.Variable(tf.zeros([512]))
+
+  thirteenth_conv = tf.nn.conv2d(twelfth_relu, thirteenth_weights, [1, 1, 1, 1],
+                             'SAME') + thirteenth_bias
+
+
+  #thirteenth_bn = slim.batch_norm(thirteenth_conv)
+  thirteenth_bn = BatchNorm(thirteenth_conv, is_training, name='bn13')
+  thirteenth_relu = tf.nn.relu(thirteenth_bn)
+
+  print('after thirteenth_relu', thirteenth_relu)
+
+
+
+
+
+  fourteenth_weights = tf.get_variable("fourteenth_weights",
+    shape=[deepwise_filter_height, deepwise_filter_width, 512, 512],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  fourteenth_bias = tf.Variable(tf.zeros([512]))
+
+  fourteenth_conv = tf.nn.conv2d(thirteenth_relu, fourteenth_weights, [1, 1, 1, 1],
+                             'SAME') + fourteenth_bias
+
+  #fourteenth_bn = slim.batch_norm(fourteenth_conv)
+  fourteenth_bn = BatchNorm(fourteenth_conv, is_training, name='bn14')
+  fourteenth_relu = tf.nn.relu(fourteenth_bn)
+
+  print('after fourteenth_relu', fourteenth_relu)
+
+
+
+  fifteenth_weights = tf.get_variable("fifteenth_weights",
+    shape=[one_filter_height, one_filter_width, 512, 512],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  fifteenth_bias = tf.Variable(tf.zeros([512]))
+
+  fifteenth_conv = tf.nn.conv2d(fourteenth_relu, fifteenth_weights, [1, 1, 1, 1],
+                             'SAME') + fifteenth_bias
+
+
+  #fifteenth_bn = slim.batch_norm(fifteenth_conv)
+  fifteenth_bn = BatchNorm(fifteenth_conv, is_training, name='bn15')
+  fifteenth_relu = tf.nn.relu(fifteenth_bn)
+
+  print('after fifteenth_relu', fifteenth_relu)
+
+
+
+
+
+  sixteenth_weights = tf.get_variable("sixteenth_weights",
+    shape=[deepwise_filter_height, deepwise_filter_width, 512, 512],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  sixteenth_bias = tf.Variable(tf.zeros([512]))
+
+  sixteenth_conv = tf.nn.conv2d(fifteenth_relu, sixteenth_weights, [1, 2, 2, 1],
+                             'SAME') + sixteenth_bias
+
+  #sixteenth_bn = slim.batch_norm(sixteenth_conv)
+  sixteenth_bn = BatchNorm(sixteenth_conv, is_training, name='bn16')
+  sixteenth_relu = tf.nn.relu(sixteenth_bn)
+
+  print('after sixteenth_relu', sixteenth_relu)
+
+
+
+
+
+
+  seventeenth_weights = tf.get_variable("seventeenth_weights",
+    shape=[one_filter_height, one_filter_width, 512, 1024],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  seventeenth_bias = tf.Variable(tf.zeros([1024]))
+
+  seventeenth_conv = tf.nn.conv2d(sixteenth_relu, seventeenth_weights, [1, 1, 1, 1],
+                             'SAME') + seventeenth_bias
+
+
+  #seventeenth_bn = slim.batch_norm(seventeenth_conv)
+  seventeenth_bn = BatchNorm(seventeenth_conv, is_training, name='bn17')
+  seventeenth_relu = tf.nn.relu(seventeenth_bn)
+
+  print('after seventeenth_relu', seventeenth_relu)
+
+
+
+  eighteenth_weights = tf.get_variable("eighteenth_weights",
+    shape=[deepwise_filter_height, deepwise_filter_width, 1024, 1024],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  eighteenth_bias = tf.Variable(tf.zeros([1024]))
+
+  eighteenth_conv = tf.nn.conv2d(seventeenth_relu, eighteenth_weights, [1, 1, 1, 1],
+                             'SAME') + eighteenth_bias
+
+  #eighteenth_bn = slim.batch_norm(eighteenth_conv)
+  eighteenth_bn = BatchNorm(eighteenth_conv, is_training, name='bn18')
+  eighteenth_relu = tf.nn.relu(eighteenth_bn)
+
+  print('after eighteenth_relu', eighteenth_relu)
+
+
+
+  nineteenth_weights = tf.get_variable("nineteenth_weights",
+    shape=[one_filter_height, one_filter_width, 1024, 1024],
+    initializer=tf.contrib.layers.xavier_initializer())
+
+  nineteenth_bias = tf.Variable(tf.zeros([1024]))
+
+  nineteenth_conv = tf.nn.conv2d(eighteenth_relu, nineteenth_weights, [1, 1, 1, 1],
+                             'SAME') + nineteenth_bias
+
+
+  #nineteenth_bn = slim.batch_norm(nineteenth_conv)
+  nineteenth_bn = BatchNorm(nineteenth_conv, is_training, name='bn19')
+  nineteenth_relu = tf.nn.relu(nineteenth_bn)
+
+  print('after nineteenth_relu', nineteenth_relu)
+
+
+
+
+
+
+
+
+  avg_pool = tf.nn.avg_pool(nineteenth_relu, [1, 7, 7, 1], [1, 1, 1, 1], 'VALID')
 
   last_conv_shape = avg_pool.get_shape()
   last_conv_output_width = last_conv_shape[2]
   last_conv_output_height = last_conv_shape[1]
 
+
+
   print('after avg_pool', avg_pool)
 
   # second_conv_element_count = 42240
+  # change last arg
   last_conv_element_count = int(
       last_conv_output_width * last_conv_output_height *
-      128)
+      1024)
+
 
   flattened_last_conv = tf.reshape(avg_pool,
                                      [-1, last_conv_element_count])
 
+  # flattened_last_conv = (?, 10368)
   print('after flattened_last_conv', flattened_last_conv)
-
-
 
   # label_count = 12 = x + 2
   label_count = model_settings['label_count']
+
+
+  print('last_conv_element_count : ', last_conv_element_count)
+
 
   final_fc_weights = tf.get_variable("final_fc_weights",
     shape=[last_conv_element_count, label_count],
@@ -477,10 +720,25 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
 
   final_fc = tf.matmul(flattened_last_conv, final_fc_weights) + final_fc_bias
 
+  print('final_fc : ', final_fc)
+
   if is_training:
     return final_fc, dropout_prob
   else:
     return final_fc
+
+
+def create_mobilenet_model(fingerprint_input, model_settings, is_training):
+  dropout_prob = tf.placeholder(tf.float32, name='dropout_prob')
+  input_frequency_size = model_settings['dct_coefficient_count']
+  input_time_size = model_settings['spectrogram_length']
+  fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size,
+                                                  input_frequency_size, 1])
+  modify_fingerprint_4d = tf.image.resize_bilinear(fingerprint_4d, [224, 224])
+
+  logits, end_points = mobilenet.mobilenet(modify_fingerprint_4d, model_settings['label_count'])
+  return logits, dropout_prob
+
 
 def create_low_latency_conv_model(fingerprint_input, model_settings,
                                   is_training):
@@ -977,8 +1235,13 @@ def BatchNorm(input, is_train, decay=0.999, name='BatchNorm'):
       update_moving_variance = moving_averages.assign_moving_average(moving_variance, batch_variance, decay, zero_debias=True)
       with tf.control_dependencies([update_moving_mean, update_moving_variance]):
         return tf.identity(batch_mean), tf.identity(batch_variance)
+    
+    #mean, variance = control_flow_ops.cond(tf.cast(is_train, tf.bool), mean_var_with_update, lambda: (moving_mean, moving_variance))
 
-    mean, variance = control_flow_ops.cond(tf.cast(is_train, tf.bool), mean_var_with_update, lambda: (moving_mean, moving_variance))
+    if is_train:
+      mean, variance = mean_var_with_update()
+    else:
+      mean, variance = moving_mean, moving_variance
 
   return tf.nn.batch_normalization(input, mean, variance, beta, gamma, 1e-3)
 
