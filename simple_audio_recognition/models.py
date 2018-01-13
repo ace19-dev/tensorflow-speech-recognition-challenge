@@ -1112,10 +1112,17 @@ def create_low_latency_squeeze_model2(fingerprint_input, model_settings, is_trai
     dropout_prob = tf.placeholder(tf.float32, name='dropout_prob')
     input_frequency_size = model_settings['dct_coefficient_count']
     input_time_size = model_settings['spectrogram_length']
-    fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size, input_frequency_size, 1])
+    # fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size, input_frequency_size, 1])
+    # print('fingerprint_4d : ', fingerprint_4d)
+
+    fingerprint_3d = tf.reshape(fingerprint_input, [input_time_size, input_frequency_size, -1])
+    normal_input = tf.image.per_image_standardization(fingerprint_3d)
+    fingerprint_4d = tf.reshape(normal_input, [-1, input_time_size, input_frequency_size, 1])
     print('fingerprint_4d : ', fingerprint_4d)
 
     modify_fingerprint_4d = tf.image.resize_bilinear(fingerprint_4d,[224,224])
+
+
     print('fingerprint_4d : ', modify_fingerprint_4d)
     first_filter_width = 7
     first_filter_height = 7
