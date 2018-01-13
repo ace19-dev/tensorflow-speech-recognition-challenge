@@ -28,9 +28,3 @@
 - train batch size : 100
 - prediction batch size : 200
 
-
-  fingerprint_3d = tf.reshape(fingerprint_input, [input_time_size, input_frequency_size, -1])
-
-  normal_input = tf.image.per_image_standardization(fingerprint_3d)
-
-  fingerprint_4d = tf.reshape(normal_input, [-1, input_time_size, input_frequency_size, 1])
