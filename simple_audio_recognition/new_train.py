@@ -146,9 +146,10 @@ def main(_):
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
     # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
+    train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
     # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
+    # train_step = tf.train.AdadeltaOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    # train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
   correct_prediction = tf.equal(predicted_indices, ground_truth_input)
   confusion_matrix = tf.confusion_matrix(
@@ -199,7 +200,7 @@ def main(_):
     # Pull the audio samples we'll use for training.
     train_fingerprints, train_ground_truth = \
       audio_processor.get_data(
-        FLAGS.batch_size, -1, model_settings, FLAGS.background_frequency,
+        FLAGS.batch_size, 0, model_settings, FLAGS.background_frequency,
         FLAGS.background_volume, time_shift_samples, 'training', sess)
     # Run the graph with this batch of training data.
     train_summary, train_accuracy, cross_entropy_value, _, _ = sess.run(
@@ -328,7 +329,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='/share/speech_dataset_timeshift_gain_',
+      default='/share/speech_dataset_timeshift_gain_10x_',
       help="""\
       Where to download the speech training data to.
       """)
@@ -412,17 +413,17 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=str,
-      default='9000,5000',
+      default='45000,15000',
       help='How many training loops to run',)
   parser.add_argument(
       '--eval_step_interval',
       type=int,
-      default=1000,
+      default=3000,
       help='How often to evaluate the training results.')
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.002,0.0001',
+      default='0.001,0.0001',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
@@ -462,7 +463,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='mobile2',
+      default='squeeze2',
       help='What model architecture to use')
   parser.add_argument(
     '--prediction_batch_size',
