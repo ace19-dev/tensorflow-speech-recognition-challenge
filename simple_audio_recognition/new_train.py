@@ -146,8 +146,8 @@ def main(_):
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
     # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
-    # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
+    train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
     # train_step = tf.train.AdadeltaOptimizer(learning_rate_input).minimize(cross_entropy_mean)
     # train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
@@ -383,7 +383,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--validation_percentage',
       type=int,
-      default=10,
+      default=5,
       help='What percentage of wavs to use as a validation set.')
   parser.add_argument(
       '--sample_rate',
@@ -418,7 +418,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--eval_step_interval',
       type=int,
-      default=3000,
+      default=5000,
       help='How often to evaluate the training results.')
   parser.add_argument(
       '--learning_rate',
