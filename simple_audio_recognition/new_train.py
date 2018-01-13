@@ -145,9 +145,9 @@ def main(_):
         tf.float32, [], name='learning_rate_input')
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
-    # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
     # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
-    train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
     # train_step = tf.train.AdadeltaOptimizer(learning_rate_input).minimize(cross_entropy_mean)
     # train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
@@ -423,7 +423,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.001,0.0001',
+      default='0.05,0.0001',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',

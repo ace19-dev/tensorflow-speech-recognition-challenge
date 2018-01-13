@@ -105,14 +105,14 @@ def create_model(fingerprint_input, model_settings, model_architecture,
     return create_conv_model(fingerprint_input, model_settings, is_training)
   elif model_architecture == 'mobile':
     return create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_training)
-  elif model_architecture == 'mobile2':
-    return create_mobilenet_model(fingerprint_input, model_settings, is_training)
-  elif model_architecture == 'low_latency_conv':
-    return create_low_latency_conv_model(fingerprint_input, model_settings,
-                                         is_training)
-  elif model_architecture == 'low_latency_svdf':
-    return create_low_latency_svdf_model(fingerprint_input, model_settings,
-                                         is_training, runtime_settings)
+  # elif model_architecture == 'mobile2':
+  #   return create_mobilenet_model(fingerprint_input, model_settings, is_training)
+  # elif model_architecture == 'low_latency_conv':
+  #   return create_low_latency_conv_model(fingerprint_input, model_settings,
+  #                                        is_training)
+  # elif model_architecture == 'low_latency_svdf':
+  #   return create_low_latency_svdf_model(fingerprint_input, model_settings,
+  #                                        is_training, runtime_settings)
   elif model_architecture == 'squeeze':
     return create_low_latency_squeeze_model(fingerprint_input, model_settings, is_training)
   elif model_architecture == 'squeeze2':
@@ -310,7 +310,13 @@ def create_low_layer_mobilenet_model(fingerprint_input, model_settings, is_train
     dropout_prob = tf.placeholder(tf.float32, name='dropout_prob')
   input_frequency_size = model_settings['dct_coefficient_count']
   input_time_size = model_settings['spectrogram_length']
-  fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size, input_frequency_size, 1])
+  # fingerprint_4d = tf.reshape(fingerprint_input, [-1, input_time_size, input_frequency_size, 1])
+
+  fingerprint_3d = tf.reshape(fingerprint_input, [input_time_size, input_frequency_size, -1])
+  normal_input = tf.image.per_image_standardization(fingerprint_3d)
+  fingerprint_4d = tf.reshape(normal_input, [-1, input_time_size, input_frequency_size, 1])
+  print('fingerprint_4d : ', fingerprint_4d)
+
 
   print('... ')
   print('... ')
