@@ -11,6 +11,15 @@ global global_figure_no
 
 
 # silent 인지 여부 체크
+def check_silence_from_file(file, threshold):
+    sound = AudioSegment.from_wav(file)
+    peak_value = sound.max
+    if peak_value <= threshold:
+        return True
+    return False
+
+
+# silent 인지 여부 체크
 def is_silent(threshold, peak_value):
     if pow(threshold, 2) >= pow(peak_value, 2):
         return True
@@ -464,11 +473,11 @@ def main():
     do_print = True
     wav_volume_threshold = 1200
     do_append_silent = True
-    do_figure = True
+    do_figure = False
     do_wav_volume_normalization = False
     wav_volume_normalization_target = -30.0
 
-    from_file_name = "clip_00ad51776"
+    from_file_name = "00f0204f_nohash_0"
     to_file_name = from_file_name + "__"
 
     result = wav_generator_using_posotion(do_print, from_file_name, to_file_name, wav_volume_threshold,
@@ -485,8 +494,8 @@ def main():
         for i in range(1, 4 + 1):
             gen_file_name.append(to_file_name + "_gen_right_" + str(i))
 
-        volume_gain_min = -35
-        volume_gain_max = -19
+        volume_gain_min = -100
+        volume_gain_max = -16
         volume_gain_step = 2
         for i in range(0, len(gen_file_name)):
             from_file_name = gen_file_name[i]

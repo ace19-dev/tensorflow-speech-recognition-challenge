@@ -4,6 +4,7 @@ import wave, struct
 import numpy as np
 import matplotlib.pyplot as plt
 from shutil import *
+import csv
 
 from wav_processor import *
 
@@ -38,16 +39,23 @@ def main():
     volume_gain_max = -19
     volume_gain_step = 2
 
-    basedir = "D:\\tmp"
-    dataset_dir = "speech_dataset"
+    # 사일런스 분리 모드
+    using_silence_check = True
+
+    basedir = "D:\\tmp\\test"
+    dataset_dir = "audio"
     target_dir_prefix = "_"
     #if do_wav_volume_normalization:
     #    target_dir_prefix += ("_volume_" + str(wav_volume_normalization_target) + "_")
 
-    if using_startpoint:
-        target_dir_prefix += ("timeshift_")
-    if using_gain:
-        target_dir_prefix += ("gain_10x_")
+    if using_silence_check:
+        target_dir_prefix += ("silence_")
+        target_dir_prefix2 = dataset_dir + "_nonsilence_"
+    else:
+        if using_startpoint:
+            target_dir_prefix += ("timeshift_")
+        if using_gain:
+            target_dir_prefix += ("gain_10x_")
 
     target_dir_prefix = dataset_dir + target_dir_prefix
 
@@ -58,6 +66,7 @@ def main():
     print("root directory prefix: " + rootdir)
     print("target directory prefix: " + targetdir)
 
+    submission = dict()
     result = True
     process_count = 0
     total_file_count = count_files(rootdir)
@@ -77,13 +86,30 @@ def main():
             # 예외 파일 처리
             if full_path.find(".wav") == -1:
                 print("%s is not wav file" % full_path)
-                copyfile(full_path, target_full_path)
+                if using_silence_check == False:
+                    copyfile(full_path, target_full_path)
                 continue
 
             # _background_noise_ 폴더 제외
             if full_path.find("_background_noise_") != -1:
                 print("%s is excepted file" % full_path)
                 copyfile(full_path, target_full_path)
+                continue
+
+            # 사일런스 체크 모드?
+            if using_silence_check:
+                if check_silence_from_file(full_path, 0):
+                    print("Detect silence file: " + full_path)
+                    # copy silence file
+                    copyfile(full_path, target_full_path)
+                    #move(full_path, target_full_path)
+                    submission[filename] = 'silence'
+                #else:
+                    # copy nonsilence file
+                    target_path2 = root.replace(dataset_dir, target_dir_prefix2)
+                    check_dir(target_path2)
+                    target_full_path2 = os.path.join(target_path2, filename)
+                    copyfile(full_path, target_full_path2)
                 continue
 
             if os.path.exists(full_path):
@@ -122,6 +148,20 @@ def main():
 
         #if result == False:
         #    break;
+
+    # make submission_silence.csv
+    if using_silence_check:
+        fout = open(os.path.join(targetdir, 'submission_silence.csv'), 'w',
+                    encoding='utf-8', newline='')
+        writer = csv.writer(fout)
+        #writer.writerow(['fname', 'label'])
+        write_count = 0
+        for key in sorted(submission.keys()):
+            writer.writerow([key, submission[key]])
+            write_count += 1
+        fout.close()
+
+        print("silence files count: ", write_count)
 
 if __name__ == '__main__':
     main()
