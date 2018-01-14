@@ -40,7 +40,7 @@ def main():
     volume_gain_step = 2
 
     # 사일런스 분리 모드
-    using_silence_check = True
+    using_split_silence = True
 
     basedir = "D:\\tmp\\test"
     dataset_dir = "audio"
@@ -48,9 +48,9 @@ def main():
     #if do_wav_volume_normalization:
     #    target_dir_prefix += ("_volume_" + str(wav_volume_normalization_target) + "_")
 
-    if using_silence_check:
-        target_dir_prefix += ("silence_")
-        target_dir_prefix2 = dataset_dir + "_nonsilence_"
+    if using_split_silence:
+        target_dir_prefix += "silence_"
+        target_dir_prefix_nonsilence = dataset_dir + "_nonsilence_"
     else:
         if using_startpoint:
             target_dir_prefix += ("timeshift_")
@@ -86,7 +86,7 @@ def main():
             # 예외 파일 처리
             if full_path.find(".wav") == -1:
                 print("%s is not wav file" % full_path)
-                if using_silence_check == False:
+                if using_split_silence == False:
                     copyfile(full_path, target_full_path)
                 continue
 
@@ -96,20 +96,19 @@ def main():
                 copyfile(full_path, target_full_path)
                 continue
 
-            # 사일런스 체크 모드?
-            if using_silence_check:
-                if check_silence_from_file(full_path, 0):
+            # 사일런스 분리 모드?
+            if using_split_silence:
+                if check_peak_from_file(full_path, 0, 0):
                     print("Detect silence file: " + full_path)
                     # copy silence file
                     copyfile(full_path, target_full_path)
-                    #move(full_path, target_full_path)
                     submission[filename] = 'silence'
-                #else:
-                    # copy nonsilence file
-                    target_path2 = root.replace(dataset_dir, target_dir_prefix2)
-                    check_dir(target_path2)
-                    target_full_path2 = os.path.join(target_path2, filename)
-                    copyfile(full_path, target_full_path2)
+                else:
+                    # copy non-silence file
+                    target_path_nonsilence = root.replace(dataset_dir, target_dir_prefix_nonsilence)
+                    check_dir(target_path_nonsilence)
+                    target_full_path_nonsilence = os.path.join(target_path_nonsilence, filename)
+                    copyfile(full_path, target_full_path_nonsilence)
                 continue
 
             if os.path.exists(full_path):
@@ -149,10 +148,10 @@ def main():
         #if result == False:
         #    break;
 
-    # make submission_silence.csv
-    if using_silence_check:
-        fout = open(os.path.join(targetdir, 'submission_silence.csv'), 'w',
-                    encoding='utf-8', newline='')
+    # make submission_xxx.csv
+    if using_split_silence:
+        fout = open(os.path.join(targetdir, 'submission_silence.csv'), 'w', encoding='utf-8', newline='')
+        #fout = open('submission_silence.csv', 'w', encoding='utf-8', newline='')
         writer = csv.writer(fout)
         #writer.writerow(['fname', 'label'])
         write_count = 0
@@ -160,7 +159,6 @@ def main():
             writer.writerow([key, submission[key]])
             write_count += 1
         fout.close()
-
         print("silence files count: ", write_count)
 
 if __name__ == '__main__':

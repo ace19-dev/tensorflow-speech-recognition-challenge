@@ -10,11 +10,11 @@ from pydub import AudioSegment
 global global_figure_no
 
 
-# silent 인지 여부 체크
-def check_silence_from_file(file, threshold):
+# peak value 체크
+def check_peak_from_file(file, min_threshold, max_threshold):
     sound = AudioSegment.from_wav(file)
     peak_value = sound.max
-    if peak_value <= threshold:
+    if peak_value >= min_threshold and peak_value <= max_threshold:
         return True
     return False
 
@@ -477,8 +477,11 @@ def main():
     do_wav_volume_normalization = False
     wav_volume_normalization_target = -30.0
 
-    from_file_name = "00f0204f_nohash_0"
+    from_file_name = "clip_0003c7122"
     to_file_name = from_file_name + "__"
+
+    check_peak_from_file(from_file_name+".wav", 0, 0)
+    return
 
     result = wav_generator_using_posotion(do_print, from_file_name, to_file_name, wav_volume_threshold,
                                           do_append_silent, do_figure, do_wav_volume_normalization,
