@@ -1,0 +1,2 @@
+model_checkpoint_path: "squeeze.ckpt-24000"
+all_model_checkpoint_paths: "squeeze.ckpt-24000"
