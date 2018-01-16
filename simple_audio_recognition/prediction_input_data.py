@@ -184,7 +184,7 @@ class AudioProcessor(object):
       sample_count = max(0, min(how_many, len(candidates) - offset))
     # Data will be populated and returned.
     data = np.zeros((sample_count, model_settings['fingerprint_size']))
-    fname = np.empty(sample_count, dtype="S20")
+    fname = np.empty(sample_count, dtype="U20")
     desired_samples = model_settings['desired_samples']
     use_background = self.background_data and False
     pick_deterministically = True
