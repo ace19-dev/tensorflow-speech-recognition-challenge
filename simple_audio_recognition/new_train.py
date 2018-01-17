@@ -241,7 +241,7 @@ def main(_):
                      cross_entropy_value))
       loop_num_on_one_epoch += 1
 
-      is_last_step = ((set_size - i) / FLAGS.batch_size < 1)
+      is_last_step = ((set_size - i) / FLAGS.batch_size <= 1)
       # if (i % FLAGS.eval_step_interval) == 0 or is_last_step:
       if is_last_step:
         set_size = audio_processor.set_size('validation')
