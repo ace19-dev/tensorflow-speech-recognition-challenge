@@ -363,8 +363,8 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='/tmp/speech_dataset',
-      #default='/tmp/speech_dataset_timeshift_gain_10x_',
+      default='/share/speech_dataset',
+      #default='/share/speech_dataset_timeshift_gain_10x_',
       #default='../../../dl_data/speech_commands/speech_dataset/',
       help="""\
       Where to download the speech training data to.
@@ -372,7 +372,7 @@ if __name__ == '__main__':
   parser.add_argument(
     '--prediction_data_dir',
     type=str,
-    default='/tmp/audio/',
+    default='/share/audio/',
     help="""\
           Where is speech prediction data.
           """)
@@ -494,7 +494,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--start_checkpoint',
       type=str,
-      default='./models\squeeze.ckpt-1',
+      default='',
       help='If specified, restore this pretrained model before any training.')
   parser.add_argument(
       '--model_architecture',
