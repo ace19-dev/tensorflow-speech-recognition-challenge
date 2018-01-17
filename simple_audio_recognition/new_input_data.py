@@ -369,6 +369,11 @@ class AudioProcessor(object):
     """
     return len(self.data_index[mode])
 
+
+  def shuffle_data(self, mode):
+    random.shuffle(self.data_index[mode])
+
+
   def get_data(self, how_many, offset, model_settings, background_frequency,
                background_volume_range, time_shift, mode, sess):
     """Gather samples from the data set, applying transformations as needed.
@@ -401,7 +406,8 @@ class AudioProcessor(object):
     labels = np.zeros(sample_count)
     desired_samples = model_settings['desired_samples']
     use_background = self.background_data and (mode == 'training')
-    pick_deterministically = (mode != 'training')
+    # pick_deterministically = (mode != 'training')
+    pick_deterministically = True
     # Use the processing graph we created earlier to repeatedly to generate the
     # final output sample data we'll use in training.
     for i in xrange(offset, offset + sample_count):
