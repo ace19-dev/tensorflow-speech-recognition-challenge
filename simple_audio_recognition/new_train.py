@@ -146,8 +146,8 @@ def main(_):
     momentum = tf.placeholder(tf.float32, [], name='momentum')
     # optimizer
     # train_step = tf.train.GradientDescentOptimizer(learning_rate_input).minimize(cross_entropy_mean)
-    # train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
-    train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
+    train_step = tf.train.MomentumOptimizer(learning_rate_input, momentum, use_nesterov=True).minimize(cross_entropy_mean)
+    # train_step = tf.train.AdamOptimizer(learning_rate_input).minimize(cross_entropy_mean)
     # train_step = tf.train.RMSPropOptimizer(learning_rate_input, momentum).minimize(cross_entropy_mean)
   predicted_indices = tf.argmax(logits, 1)
   correct_prediction = tf.equal(predicted_indices, ground_truth_input)
@@ -212,7 +212,7 @@ def main(_):
 
     loop_num_on_one_epoch = 0
     # data shuffle
-    audio_processor.shuffle_data('training')
+    audio_processor.shuffle_data()
     set_size = audio_processor.set_size('training')
     for i in xrange(0, set_size, FLAGS.batch_size):
       # Pull the audio samples we'll use for training.
@@ -363,9 +363,9 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='/share/speech_dataset',
-      #default='/share/speech_dataset_timeshift_gain_10x_',
-      #default='../../../dl_data/speech_commands/speech_dataset/',
+      # default='/share/speech_dataset',
+      # default='/share/speech_dataset_timeshift_gain_10x_',
+      default='../../../dl_data/speech_commands/speech_dataset/',
       help="""\
       Where to download the speech training data to.
       """)
@@ -407,7 +407,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--time_shift_ms',
       type=float,
-      default=100.0,
+      default=150.0,
       help="""\
       Range to randomly shift the training audio by in time.
       """)
@@ -449,7 +449,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_epochs',
       type=str,
-      default='1,0',
+      default='50,50',
       help='How many training epochs to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -459,12 +459,12 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.001,0.0001',
+      default='0.003,0.0003',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
       type=int,
-      default=50,
+      default=100,
       help='How many items to train with at once',)
   parser.add_argument(
       '--summaries_dir',
@@ -499,7 +499,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--model_architecture',
       type=str,
-      default='squeeze',
+      default='mobile2',
       help='What model architecture to use')
   parser.add_argument(
     '--prediction_batch_size',

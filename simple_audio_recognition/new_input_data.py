@@ -370,8 +370,18 @@ class AudioProcessor(object):
     return len(self.data_index[mode])
 
 
-  def shuffle_data(self, mode):
-    random.shuffle(self.data_index[mode])
+  def shuffle_data(self):
+    training_size = self.set_size('training')
+    tmp_data = self.data_index['training'].copy()
+    tmp_data.extend(self.data_index['validation'])
+
+    random.shuffle(tmp_data)
+
+    self.data_index['training'].clear()
+    self.data_index['validation'].clear()
+
+    self.data_index['training'].extend(tmp_data[:training_size])
+    self.data_index['validation'].extend(tmp_data[training_size:])
 
 
   def get_data(self, how_many, offset, model_settings, background_frequency,
