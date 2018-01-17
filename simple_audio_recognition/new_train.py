@@ -269,7 +269,7 @@ def main(_):
             total_conf_matrix += conf_matrix
 
         tf.logging.info('Confusion Matrix:\n %s' % (total_conf_matrix))
-        tf.logging.info('Step %d: Validation accuracy = %.1f%% (N=%d)' %
+        tf.logging.info('Epoch %d: Validation accuracy = %.1f%% (N=%d)' %
                         (training_epoch, total_accuracy * 100, set_size))
 
     # Save the model checkpoint periodically.
@@ -449,7 +449,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_epochs',
       type=str,
-      default='50,50',
+      default='40,60',
       help='How many training epochs to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -459,7 +459,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--learning_rate',
       type=str,
-      default='0.003,0.0003',
+      default='0.003,0.0002',
       help='How large a learning rate to use when training.')
   parser.add_argument(
       '--batch_size',
