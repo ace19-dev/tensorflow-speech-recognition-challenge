@@ -170,6 +170,7 @@ def main(_):
   tf.global_variables_initializer().run()
 
   start_epoch = 1
+  start_checkpoint_epoch = 0
   if FLAGS.start_checkpoint:
     models.load_variables_from_checkpoint(sess, FLAGS.start_checkpoint)
     #start_epoch = global_step.eval(session=sess)
@@ -177,23 +178,29 @@ def main(_):
     tmp = FLAGS.start_checkpoint
     tmp = tmp.split('-')
     tmp.reverse()
-    start_epoch = int(tmp[0]) + 1
+    start_checkpoint_epoch = int(tmp[0])
+    start_epoch = start_checkpoint_epoch + 1
 
-  tf.logging.info('Training from epoch: %d ', start_epoch)
+  # calculate training epochs max
+  training_epochs_max = np.sum(training_epochs_list)
 
-  # Save graph.pbtxt.
-  tf.train.write_graph(sess.graph_def, FLAGS.train_dir,
-                       FLAGS.model_architecture + '.pbtxt')
+  # start_checkpoint 값과 training_epochs_max 값이 다를 경우에만 training 수행 (kim-jongsung)
+  if start_checkpoint_epoch != training_epochs_max:
+      tf.logging.info('Training from epoch: %d ', start_epoch)
 
-  # Save list of words.
-  with gfile.GFile(
-      os.path.join(FLAGS.train_dir, FLAGS.model_architecture + '_labels.txt'),
-      'w') as f:
-    f.write('\n'.join(audio_processor.words_list))
+      # Save graph.pbtxt.
+      tf.train.write_graph(sess.graph_def, FLAGS.train_dir,
+                           FLAGS.model_architecture + '.pbtxt')
+
+      # Save list of words.
+      with gfile.GFile(
+          os.path.join(FLAGS.train_dir, FLAGS.model_architecture + '_labels.txt'),
+          'w') as f:
+        f.write('\n'.join(audio_processor.words_list))
 
 
   # Training epoch
-  training_epochs_max = np.sum(training_epochs_list)
+  #training_epochs_max = np.sum(training_epochs_list)
   for training_epoch in xrange(start_epoch, training_epochs_max + 1):
     # Figure out what the current learning rate is.
     training_epochs_sum = 0
@@ -274,30 +281,33 @@ def main(_):
       saver.save(sess, checkpoint_path, global_step=training_epoch)
 
 
-  set_size = audio_processor.set_size('testing')
-  tf.logging.info('set_size=%d', set_size)
-  total_accuracy = 0
-  total_conf_matrix = None
-  for i in xrange(0, set_size, FLAGS.batch_size):
-    test_fingerprints, test_ground_truth = audio_processor.get_data(
-        FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
-    test_accuracy, conf_matrix = sess.run(
-        [evaluation_step, confusion_matrix],
-        feed_dict={
-            fingerprint_input: test_fingerprints,
-            ground_truth_input: test_ground_truth,
-            dropout_prob: 1.0
-        })
-    batch_size = min(FLAGS.batch_size, set_size - i)
-    total_accuracy += (test_accuracy * batch_size) / set_size
-    if total_conf_matrix is None:
-      total_conf_matrix = conf_matrix
-    else:
-      total_conf_matrix += conf_matrix
-  tf.logging.info('Confusion Matrix:\n %s' % (total_conf_matrix))
-  tf.logging.info('Final test accuracy = %.1f%% (N=%d)' % (total_accuracy * 100,
-                                                           set_size))
+  # start_checkpoint 값과 training_epochs_max 값이 다를 경우에만 testing 수행 (kim-jongsung)
+  if start_checkpoint_epoch != training_epochs_max:
+      set_size = audio_processor.set_size('testing')
+      tf.logging.info('set_size=%d', set_size)
+      total_accuracy = 0
+      total_conf_matrix = None
+      for i in xrange(0, set_size, FLAGS.batch_size):
+        test_fingerprints, test_ground_truth = audio_processor.get_data(
+            FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
+        test_accuracy, conf_matrix = sess.run(
+            [evaluation_step, confusion_matrix],
+            feed_dict={
+                fingerprint_input: test_fingerprints,
+                ground_truth_input: test_ground_truth,
+                dropout_prob: 1.0
+            })
+        batch_size = min(FLAGS.batch_size, set_size - i)
+        total_accuracy += (test_accuracy * batch_size) / set_size
+        if total_conf_matrix is None:
+          total_conf_matrix = conf_matrix
+        else:
+          total_conf_matrix += conf_matrix
+      tf.logging.info('Confusion Matrix:\n %s' % (total_conf_matrix))
+      tf.logging.info('Final test accuracy = %.1f%% (N=%d)' % (total_accuracy * 100,
+                                                               set_size))
 
+  tf.logging.info('>>>>>>>>> predict start')
 
   # for prediction
   POSSIBLE_LABELS = new_input_data.prepare_words_list(FLAGS.wanted_words.split(','))
@@ -324,13 +334,16 @@ def main(_):
     size = len(fname)
     for n in xrange(0, size):
       submission[fname[n].decode('UTF8')] = id2name[prediction[0][n]]
-    print(i+size)
+    if (i+size) % 1000 == 0:
+      print(i + size)
+
+  tf.logging.info('>>>>>>>>> predict end')
 
   # make submission.csv
   if not os.path.exists(FLAGS.result_dir):
       os.makedirs(FLAGS.result_dir)
 
-  fout = open(os.path.join(FLAGS.result_dir, 'submission_' + FLAGS.model_architecture + '.csv'), 'w', encoding='utf-8', newline='')
+  fout = open(os.path.join(FLAGS.result_dir, 'submission_' + FLAGS.model_architecture + '_' + FLAGS.how_many_training_epochs + '.csv'), 'w', encoding='utf-8', newline='')
   writer = csv.writer(fout)
   writer.writerow(['fname', 'label'])
   for key in sorted(submission.keys()):
@@ -436,7 +449,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_epochs',
       type=str,
-      default='20,10',
+      default='1,0',
       help='How many training epochs to run',)
   parser.add_argument(
       '--eval_step_interval',
