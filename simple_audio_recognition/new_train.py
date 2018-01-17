@@ -172,7 +172,12 @@ def main(_):
   start_epoch = 1
   if FLAGS.start_checkpoint:
     models.load_variables_from_checkpoint(sess, FLAGS.start_checkpoint)
-    start_epoch = global_step.eval(session=sess)
+    #start_epoch = global_step.eval(session=sess)
+    # edited by kim-jongsung (181117)
+    tmp = FLAGS.start_checkpoint
+    tmp = tmp.split('-')
+    tmp.reverse()
+    start_epoch = int(tmp[0]) + 1
 
   tf.logging.info('Training from epoch: %d ', start_epoch)
 
@@ -186,9 +191,6 @@ def main(_):
       'w') as f:
     f.write('\n'.join(audio_processor.words_list))
 
-  # for best cross entropy
-  best_cross_entropy_value = 10.0
-  best_training_step = 0
 
   # Training epoch
   training_epochs_max = np.sum(training_epochs_list)
@@ -263,7 +265,6 @@ def main(_):
         tf.logging.info('Step %d: Validation accuracy = %.1f%% (N=%d)' %
                         (training_epoch, total_accuracy * 100, set_size))
 
-
     # Save the model checkpoint periodically.
     if (training_epoch % FLAGS.save_step_interval == 0 or
             training_epoch == training_epochs_max):
@@ -326,14 +327,15 @@ def main(_):
     print(i+size)
 
   # make submission.csv
+  if not os.path.exists(FLAGS.result_dir):
+      os.makedirs(FLAGS.result_dir)
+
   fout = open(os.path.join(FLAGS.result_dir, 'submission_' + FLAGS.model_architecture + '.csv'), 'w', encoding='utf-8', newline='')
   writer = csv.writer(fout)
   writer.writerow(['fname', 'label'])
   for key in sorted(submission.keys()):
     writer.writerow([key, submission[key]])
   fout.close()
-
-  # print("best training step %d, best_cross_entropy_value %f" % (best_training_step, best_cross_entropy_value))
 
 
 if __name__ == '__main__':
@@ -348,7 +350,8 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_dir',
       type=str,
-      default='/share/speech_dataset_vol_4x_',
+      default='/tmp/speech_dataset',
+      #default='/tmp/speech_dataset_timeshift_gain_10x_',
       #default='../../../dl_data/speech_commands/speech_dataset/',
       help="""\
       Where to download the speech training data to.
@@ -356,7 +359,7 @@ if __name__ == '__main__':
   parser.add_argument(
     '--prediction_data_dir',
     type=str,
-    default='../../../dl_data/speech_commands/test/audio/',
+    default='/tmp/audio/',
     help="""\
           Where is speech prediction data.
           """)
@@ -433,7 +436,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_epochs',
       type=str,
-      default='100,100',
+      default='20,10',
       help='How many training epochs to run',)
   parser.add_argument(
       '--eval_step_interval',
@@ -448,7 +451,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--batch_size',
       type=int,
-      default=100,
+      default=50,
       help='How many items to train with at once',)
   parser.add_argument(
       '--summaries_dir',
@@ -478,7 +481,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--start_checkpoint',
       type=str,
-      default='./models/squeeze.ckpt-70',
+      default='./models\squeeze.ckpt-1',
       help='If specified, restore this pretrained model before any training.')
   parser.add_argument(
       '--model_architecture',
