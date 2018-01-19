@@ -64,6 +64,16 @@
   - create the spectrogram png using by wav_to_spectrogram
   - each spectrogram png size change to same size
   - data augmentation
+- We will mention 9th participant's blog.
+  - http://openresearch.ai/t/ideas-for-9th-kaggle-tensorflow-speech-recognition-challenge/105 (korean version)
+    - data anlaysis.
+    - use various networks and results.
+    - data augmentation
+    - balancing the batch data
+    - ensemble
+    - etc..
+  - https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/discussion/47618
+    - 1D conv.
  
 ## Quick Start
 - It's simple. 
