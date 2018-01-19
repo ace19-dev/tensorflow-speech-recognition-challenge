@@ -66,7 +66,7 @@
   - data augmentation
 - After the challenge end, We mention 9th participant's blog.
   - http://openresearch.ai/t/ideas-for-9th-kaggle-tensorflow-speech-recognition-challenge/105 (korean version)
-    - you certainly get various wonderful ideas.
+    - i am sure you get wonderful ideas.
   - https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/discussion/47618
     - 1D conv.
  
