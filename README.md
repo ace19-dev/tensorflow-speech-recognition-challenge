@@ -64,7 +64,7 @@
   - create the spectrogram png using by wav_to_spectrogram
   - each spectrogram png size change to same size
   - data augmentation
-- We will mention 9th participant's blog.
+- After the challenge end, We mention 9th participant's blog.
   - http://openresearch.ai/t/ideas-for-9th-kaggle-tensorflow-speech-recognition-challenge/105 (korean version)
     - data anlaysis.
     - use various networks and results.
