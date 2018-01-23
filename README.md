@@ -73,7 +73,6 @@
   - https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/discussion/47618
     - 1D conv.
 
- 
 ## Quick Start
 - It's simple. 
   - python new_train.py
