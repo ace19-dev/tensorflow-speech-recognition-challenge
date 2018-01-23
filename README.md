@@ -66,7 +66,7 @@
   - data augmentation
 
 ## Result
-- We recorded the 250th with 0.86019 score - Public Leaderboard
+- We eventually reached 250th with a score of 0.86019. - Public Leaderboard
 - We recommed to see the 9th participant's blog.
   - http://openresearch.ai/t/ideas-for-9th-kaggle-tensorflow-speech-recognition-challenge/105 (korean version)
     - i am sure you get wonderful ideas.
