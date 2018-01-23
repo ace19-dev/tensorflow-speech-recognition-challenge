@@ -75,6 +75,7 @@
 
 ## Quick Start
 - It's simple. 
+  - set your own parameter
   - python new_train.py
 
 ## Additional work 
