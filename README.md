@@ -67,7 +67,7 @@
 
 ## Result
 - We eventually reached 250th with a score of 0.86019. - Public Leaderboard
-- We recommed to see the 9th participant's blog.
+- We recommed to see the 9th(0.90637) participant's blog. 
   - http://openresearch.ai/t/ideas-for-9th-kaggle-tensorflow-speech-recognition-challenge/105 (korean version)
     - i am sure you get wonderful ideas.
   - https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/discussion/47618
