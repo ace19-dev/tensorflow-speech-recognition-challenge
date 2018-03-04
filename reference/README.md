@@ -1,5 +1,5 @@
 ## Category
-- CNN Model (in progress)
+- CNN Model
   - MobileNet
   - SqueezeNet
   - simple_audio_recognition
